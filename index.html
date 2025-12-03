@@ -38,23 +38,56 @@
 <div class="manual-layout">
 
   <!-- LEFT NAV / TABLE OF CONTENTS -->
-  <nav class="manual-nav" aria-label="Manual navigation">
+<nav class="manual-nav" aria-label="Manual navigation">
   <h2 class="nav-heading">Contents</h2>
+
   <ul class="nav-sections">
+
+    <!-- ========================================================= -->
+    <!-- GENERAL MACHINE SETUP & FUNDAMENTALS                      -->
+    <!-- ========================================================= -->
+    <li class="nav-section">General Machine Setup</li>
 
     <li><a href="#chapter-coordinate-systems">Coordinate Systems &amp; C1–C9 Toolbar</a></li>
     <li><a href="#chapter-quickset">DWC Quickset Procedure (XYZ Origin)</a></li>
     <li><a href="#chapter-set-z-zero">Reset Z Axis Zero</a></li>
-	<li><a href="#chapter-laser-router-align">Move Laser &amp; Spindle Alignment Buttons</a></li>
-	<li><a href="#chapter-enable-spindle-mode">Enable Spindle Mode (Mill Mode)</a></li>
 
-    <!-- ⭐ NEW CHAPTER ⭐ -->
+    <!-- ========================================================= -->
+    <!-- SPINDLE / MILLING OPERATIONS                              -->
+    <!-- ========================================================= -->
+    <li class="nav-section">Spindle / Milling Operations</li>
+
+    <li><a href="#chapter-enable-spindle-mode">Enable Spindle Mode (Mill Mode)</a></li>
+
+    <!-- Alignment (used for both spindle + laser, but placed here as prep) -->
+    <li><a href="#chapter-laser-router-align">Move Laser &amp; Spindle Alignment Buttons</a></li>
+
+    <!-- ========================================================= -->
+    <!-- ROTARY AXIS OPERATIONS                                    -->
+    <!-- ========================================================= -->
+    <li class="nav-section">Rotary Axis Operations</li>
+
+    <li><a href="#chapter-rotary-calculator">Rotary Axis Max Speed / Step Calculator</a></li>
+
+    <li><a href="#rotary-axis-mode">Enable / Exit Rotary Axis Mode (DWC2440 Only)</a></li>
+
+    <!-- ========================================================= -->
+    <!-- LASER OPERATIONS                                           -->
+    <!-- ========================================================= -->
+    <li class="nav-section">Laser Operations</li>
+
     <li><a href="#chapter-laser-mode">Laser Mode Overview</a></li>
-	<li><a href="#chapter-laser-xy-zero">Laser XY &amp; Z Work Offset Setup</a></li>
-	<li><a href="#chapter-laser-focus-6w">Focusing the DWC 6-Watt Laser</a></li>
-	<li><a href="#chapter-laser-focus-legacy-6w">Focusing the Legacy 6-Watt Laser (PLH3D-6W)</a></li>
-	<li><a href="#chapter-laser-focus-xt8">Focusing the 45-Watt XT-8 Laser</a></li>
+    <li><a href="#chapter-laser-xy-zero">Laser XY &amp; Z Work Offset Setup</a></li>
 
+    <!-- Laser focusing chapters -->
+    <li><a href="#chapter-laser-focus-6w">Focusing the DWC 6-Watt Laser</a></li>
+    <li><a href="#chapter-laser-focus-legacy-6w">Focusing the Legacy 6-Watt Laser (PLH3D-6W)</a></li>
+    <li><a href="#chapter-laser-focus-xt8">Focusing the 45-Watt XT-8 Laser</a></li>
+
+    <!-- ========================================================= -->
+    <!-- FUTURE CONTENT PLACEHOLDER                                 -->
+    <!-- ========================================================= -->
+    <li class="nav-section">Additional Chapters (Coming Soon)</li>
     <!-- Future chapters will go below this -->
     <!-- <li><a href="#chapter-laser-xy-zero">Setting Laser XY Zero</a></li> -->
     <!-- <li><a href="#chapter-focus-6w">Focusing the DWC 6-Watt Laser</a></li> -->
@@ -62,6 +95,7 @@
 
   </ul>
 </nav>
+
 
 
   <!-- MAIN MANUAL CONTENT -->
@@ -3155,6 +3189,419 @@ Z: -4.5000
 
 </article>
 <!-- /chapter-enable-spindle-mode -->
+<!-- =========================================
+     CHAPTER: Rotary Axis Max Speed Calculator
+     ========================================= -->
+<article id="chapter-rotary-calculator" class="manual-chapter">
+
+  <h2>Rotary Axis Max Speed / Step Calculator</h2>
+
+  <p>
+    The <strong>Rotary Axis Max Speed / Step Calculator</strong> button configures the
+    A-axis (rotary axis) motion settings in OmniControl based on your stock diameter,
+    desired surface feed rate, and the machine’s motor/drive setup.
+  </p>
+
+  <p>
+    When you press this button and confirm the dialog, OmniControl:
+  </p>
+  <ul>
+    <li>Calculates a safe A-axis speed (in degrees per minute) for the current stock diameter and desired IPM feed rate.</li>
+    <li>Calculates the correct <em>steps per degree</em> for the A-axis, based on the motor steps, microstepping, and rotary gear ratio.</li>
+    <li>Writes these values directly into the controller’s A-axis settings so your rotary toolpaths run at the correct speed.</li>
+    <li>Prints a “helper snippet” in the <strong>Messages</strong> window and into a file named <code>RotaryCalc_Snippet.gcode</code> for advanced users who want to inspect or test the motion.</li>
+  </ul>
+
+  <figure class="figure-inline">
+    <img src="assets/IMG_BTN_Step_Calculator.svg"
+         alt="Rotary Axis Max Speed Calculator toolbar button">
+    <figcaption>
+      OmniControl <strong>Rotary Axis Max Speed / Step Calculator</strong> button.
+    </figcaption>
+  </figure>
+
+  <figure class="figure-large">
+    <img src="assets/rotary_step_calculator_screenshot.png"
+         alt="Rotary Axis Max Speed Calculator popup dialog">
+    <figcaption>
+      Rotary Axis Calculator dialog – enter stock diameter, desired feed rate,
+      and controller drive settings, then press <strong>OK</strong> to apply.
+    </figcaption>
+  </figure>
+
+  <aside class="callout warning">
+    <h3>Important Safety Warning</h3>
+    <p>
+      The calculator changes critical A-axis motion parameters inside the controller.
+      Running with incorrect values can cause lost steps, crashes, or mechanical damage.
+      Only use this tool as described in this manual. Do <strong>not</strong> edit
+      the underlying script files unless specifically instructed by Digital Wood Carver
+      technical support.
+    </p>
+  </aside>
+
+  <!-- 1. When to Use -->
+  <h3>1. When to Use the Rotary Axis Calculator</h3>
+
+  <p>Use this calculator whenever any of the following change:</p>
+  <ul>
+    <li>You are setting up your rotary axis for the first time.</li>
+    <li>You change to a different stock diameter than previously used.</li>
+    <li>You want to run at a different desired surface feed rate (IPM) on the rotary.</li>
+    <li>You change the A-axis motor, driver microstepping, or rotary gearing (per factory guidance).</li>
+  </ul>
+
+  <p>
+    Each Digital Wood Carver model includes a pre-configured rotary script with the
+    correct gear ratio built in (for example, <em>35/12</em> for the DWC2440 rotary).
+    You supply the stock diameter and feed information; the script handles the math.
+  </p>
+
+  <!-- 2. Stock & Feed Fields -->
+  <h3>2. Stock &amp; Feed Inputs</h3>
+
+  <p>
+    The upper portion of the dialog (<strong>&lt;&lt;&lt; STOCK &amp; FEED &gt;&gt;&gt;</strong>)
+    describes the workpiece and how fast you want to cut:
+  </p>
+
+  <ul>
+    <li>
+      <strong>Diameter (in)</strong> – The actual diameter of your rotary stock
+      in inches. Measure with calipers at the area being machined. The calculator
+      uses this to convert your desired IPM to a safe A-axis speed.
+    </li>
+    <li>
+      <strong>Desired Feed (IPM)</strong> – The surface feed rate you would like to
+      run at (inches per minute along the material surface). This should match the
+      feed rates used in your CAM (Vectric) toolpaths.
+    </li>
+    <li>
+      <strong>Machine Max Feed (IPM)</strong> – The maximum feed rate your machine
+      can realistically achieve. The calculator will automatically <em>cap</em>
+      your desired feed so it never exceeds this limit.
+      <br>
+      If your desired feed is higher than this value, the script uses the
+      <em>Machine Max Feed</em> value for safety.
+    </li>
+    <li>
+      <strong>Index angle (deg, for helper snippet)</strong> – Angle used to
+      generate the optional “helper snippet” G-code. By default this is
+      <code>360.000</code>, which represents a full revolution. Advanced users can
+      change this to generate a sample move for a different angle, but it does not
+      change the controller’s saved A-axis settings.
+    </li>
+  </ul>
+
+  <aside class="callout note">
+    <h3>Note – Accurate Diameter Matters</h3>
+    <p>
+      The rotary feed calculations depend on the <strong>actual</strong> stock diameter.
+      If your blank is tapered or irregular, measure at the primary carving area
+      or err on the side of a slightly larger diameter for safety.
+    </p>
+  </aside>
+
+  <!-- 3. Controller / Drive Fields -->
+  <h3>3. Controller / Drive Inputs</h3>
+
+  <p>
+    The lower portion of the dialog (<strong>&lt;&lt;&lt; CONTROLLER / DRIVE &gt;&gt;&gt;</strong>)
+    corresponds to your A-axis hardware:
+  </p>
+
+  <ul>
+    <li>
+      <strong>Motor full steps/rev</strong> – The number of full steps per revolution
+      for the A-axis stepper motor. Most standard steppers are
+      <code>200</code> full steps per revolution. This field is pre-filled for
+      your machine and normally should not be changed.
+    </li>
+    <li>
+      <strong>Driver microstep</strong> – The microstepping setting of the A-axis
+      stepper driver (for example, <code>8</code> microsteps per full step).
+      This value must match the DIP-switch settings on the stepper driver.
+      It is also pre-filled and should only be changed if the driver
+      configuration is changed.
+    </li>
+  </ul>
+
+  <p>
+    Together with the built-in rotary gear ratio for your model, these values
+    allow the script to calculate:
+  </p>
+  <ul>
+    <li><strong>Steps per revolution</strong> for the chuck or fixture.</li>
+    <li><strong>Steps per degree</strong> (written to the controller).</li>
+    <li>A safe, capped <strong>A-axis speed</strong> in degrees per minute.</li>
+  </ul>
+
+  <!-- 4. Running the Calculator -->
+  <h3>4. Running the Rotary Axis Calculator</h3>
+
+  <h4>4.1 Prepare the Rotary Setup</h4>
+  <ol>
+    <li>Mount your rotary axis and workpiece securely.</li>
+    <li>Measure the stock diameter in inches.</li>
+    <li>Home the machine (if your model uses homing) and set a safe clearance height.</li>
+  </ol>
+
+  <h4>4.2 Open the Calculator Dialog</h4>
+  <ol>
+    <li>Ensure OmniControl is in the correct machine profile for your DWC model.</li>
+    <li>Click the <strong>Rotary Axis Max Speed / Step Calculator</strong> button in the top toolbar.</li>
+    <li>The calculator dialog will appear at the center of the screen.</li>
+  </ol>
+
+  <h4>4.3 Enter Stock &amp; Feed Information</h4>
+  <ol>
+    <li>Type your measured <strong>Diameter (in)</strong> into the field.</li>
+    <li>Enter your <strong>Desired Feed (IPM)</strong> based on your toolpath settings.</li>
+    <li>Confirm or adjust the <strong>Machine Max Feed (IPM)</strong> if needed (do not exceed factory recommendations).</li>
+    <li>
+      Optionally adjust the <strong>Index angle (deg)</strong> if you want a
+      helper snippet generated for a different angle than 360°.
+    </li>
+  </ol>
+
+  <h4>4.4 Confirm Controller / Drive Values</h4>
+  <ol>
+    <li>
+      Verify that <strong>Motor full steps/rev</strong> matches your A-axis stepper
+      motor (typically <code>200</code>).
+    </li>
+    <li>
+      Verify that <strong>Driver microstep</strong> matches your stepper driver’s
+      DIP-switch settings.
+    </li>
+    <li>
+      If you are unsure, contact Digital Wood Carver support before changing these values.
+    </li>
+  </ol>
+
+  <h4>4.5 Apply the Calculations</h4>
+  <ol>
+    <li>
+      Double-check all entries. When you are satisfied, click the
+      <strong>OK (✓)</strong> button in the upper-right corner of the dialog.
+    </li>
+    <li>
+      OmniControl will compute the A-axis steps/degree and a safe A-axis speed,
+      then write them into the controller’s A-axis configuration.
+    </li>
+    <li>
+      A short confirmation dialog appears summarizing the applied settings and
+      showing the target degrees per minute at the specified diameter.
+    </li>
+  </ol>
+
+  <p>
+    If you change your mind before applying the settings, press the
+    <strong>ESC</strong> key on the keyboard while the dialog is open to cancel
+    without writing anything to the controller.
+  </p>
+
+  <!-- 5. Helper Snippet Output -->
+  <h3>5. Rotary Helper Snippet (Advanced)</h3>
+
+  <p>
+    Each time you run the calculator, it also generates a small “helper snippet”
+    of G-code that matches the chosen angle and calculated A-axis speed.
+    This information is intended for advanced users and support technicians.
+  </p>
+
+  <ul>
+    <li>
+      The snippet is printed in the <strong>Messages</strong> window and saved to
+      a file named <code>RotaryCalc_Snippet.gcode</code> in the controller’s log
+      folder.
+    </li>
+    <li>
+      It shows the calculated steps/degree, estimated steps/second, and a
+      sample move in <strong>G93 inverse-time</strong> and <strong>G94</strong> modes.
+    </li>
+  </ul>
+
+  <p>
+    For typical users, you do not need to use this snippet directly—simply
+    running the calculator and pressing <strong>OK</strong> is enough to configure
+    the rotary axis. The snippet is there for verification, troubleshooting,
+    and advanced testing.
+  </p>
+
+  <!-- 6. Safety & Best Practices -->
+  <h3>6. Safety &amp; Best Practices</h3>
+
+  <ul>
+    <li>
+      Always make sure your stock is clamped securely and cannot slip on the rotary.
+    </li>
+    <li>
+      Start with conservative feed rates on large, heavy, or unbalanced parts,
+      even if the calculator allows higher speeds.
+    </li>
+    <li>
+      If you ever change the A-axis hardware (different motor, microstepping, or gear ratio),
+      contact Digital Wood Carver support for updated guidance before using this tool.
+    </li>
+    <li>
+      If rotary motion sounds harsh, skips, or stalls, stop immediately and
+      re-check your inputs, especially stock diameter and feed values.
+    </li>
+  </ul>
+
+</article>
+<section id="rotary-axis-mode">
+  <h1 class="chapter-title">Enable / Exit Rotary Axis Mode  
+    <span class="model-note">(DWC2440 Model Only)</span>
+  </h1>
+
+  <p>
+    The DWC2440 CNC router is equipped with a unique <strong>rotating spindle mounting plate</strong> 
+    that allows the spindle to pivot from its standard upright position to a horizontal orientation for 
+    rotary (A-axis) machining. This feature enables users to carve cylindrical and 4-sided projects using 
+    the optional Rotary Axis System.
+  </p>
+
+  <!-- Safety Warning Block -->
+  <div class="warning-block">
+    <h3>⚠️ Important Rotary Mode Safety Requirements</h3>
+    <ul>
+      <li><strong>Never enable Rotary Axis Mode unless the spindle has been physically rotated 90°</strong> into the rotary cutting position.</li>
+      <li><strong>Always retighten all three spindle-plate bolts</strong> before pressing "Enable Rotary Axis Mode."</li>
+      <li><strong>Loose or misaligned spindle orientation can cause tram issues, tool breakage, or project failure.</strong></li>
+      <li>After completing rotary work, <strong>you must rotate the spindle back upright</strong> before exiting rotary mode.</li>
+      <li>
+        Because rotating the spindle can affect tramming, Digital Wood Carver recommends periodic verification 
+        using a dual-dial tramming tool such as the 
+        <em>Mini Tram Pro</em> from Edge Technologies.
+      </li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <!-- Standard Spindle Orientation -->
+  <h2>Standard 3-Axis Spindle Orientation</h2>
+  <p>
+    In normal operation (flat work), the spindle remains upright at the 0° reference stop on the spindle plate. 
+    This is the position required for:
+  </p>
+  <ul>
+    <li>Standard V-carving and profile cutting</li>
+    <li>Pocketing and 3D relief carving</li>
+    <li>Surfacing operations</li>
+  </ul>
+
+  <figure class="figure-large">
+    <img src="assets/DWC_4thAxis_Disable_350.png"
+         alt="DWC2440 in standard 3-axis upright spindle position">
+    <figcaption>
+      Standard 3-Axis Mode — Spindle upright at 0°.
+    </figcaption>
+  </figure>
+
+  <hr>
+
+  <!-- Rotary Spindle Orientation -->
+  <h2>Rotary Orientation for A-Axis Machining</h2>
+  <p>
+    For rotary work, the spindle must be rotated <strong>exactly 90°</strong> to align with the axis of the 
+    rotary chuck and tailstock. The DWC2440 mounting plate contains a built-in positive stop at this angle.
+  </p>
+
+  <h3>Physical Rotation Procedure</h3>
+  <ol>
+    <li>Turn off the spindle and ensure the machine is at rest.</li>
+    <li>Loosen the <strong>three spindle-plate bolts</strong> to allow rotation.</li>
+    <li>Pivot the spindle until it seats firmly against the 90° stop.</li>
+    <li><strong>Retighten all three bolts securely.</strong></li>
+    <li>Confirm that no cables, hoses, or dust lines are stressed or pinched.</li>
+  </ol>
+
+  <figure class="figure-large">
+    <img src="assets/DWC_4thAxis_Enable_350.png"
+         alt="DWC2440 spindle rotated 90 degrees for rotary axis operation">
+    <figcaption>
+      Rotary Mode — Spindle rotated 90° toward the rotary axis.
+    </figcaption>
+  </figure>
+
+  <hr>
+
+  <!-- Enable Rotary Axis Mode -->
+  <h2 id="enable-rotary-axis-mode">Enable Rotary Axis Mode</h2>
+
+  <p>
+    Once the spindle is physically rotated to the correct 90° orientation, users may click the 
+    <strong>Enable Rotary Axis Mode</strong> button on the OmniControl toolbar. This action activates a script 
+    that reconfigures the machine's controller specifically for rotary operation.
+  </p>
+
+  <h3>What the Script Changes Internally</h3>
+  <ul>
+    <li><strong>Swaps Y and Z axis roles</strong> (Z becomes vertical distance from the rotary axis, Y becomes axial travel).</li>
+    <li><strong>Updates motor output order</strong> for correct axis mapping.</li>
+    <li><strong>Reverses or corrects motor direction logic</strong> depending on axis assignment.</li>
+    <li><strong>Applies rotary-specific Steps-Per-Unit</strong> values.</li>
+    <li><strong>Updates limit positions and enables/disables limit inputs</strong> for rotary layout.</li>
+    <li><strong>Reconfigures homing order and direction</strong> (if limit switches are installed).</li>
+    <li><strong>Swaps current Y/Z machine position values</strong> to prevent coordinate discontinuities.</li>
+  </ul>
+
+  <p>
+    These changes ensure that rotary toolpaths generated in Vectric software behave correctly on the DWC2440.
+  </p>
+
+  <div class="note-block">
+    <strong>Note:</strong> If the machine has limit switches installed, home the machine before setting work offsets.  
+    If operating without switches (common on hobby units), simply set <strong>X, Y, and Z work offset origins</strong> 
+    manually before carving.
+  </div>
+
+  <hr>
+
+  <!-- Exit Rotary Mode -->
+  <h2 id="exit-rotary-axis-mode">Exit Rotary Axis Mode</h2>
+
+  <p>
+    When rotary carving is complete, users must return the DWC2440 to its standard 3-axis operating 
+    configuration by clicking <strong>Exit Rotary Axis Mode</strong>.
+  </p>
+
+  <h3>Before Clicking Exit</h3>
+  <ul>
+    <li>Power down the spindle and allow all motion to stop.</li>
+    <li>Loosen the three spindle-plate bolts.</li>
+    <li>Rotate the spindle back to the <strong>0° upright position</strong>.</li>
+    <li><strong>Retighten the bolts securely.</strong></li>
+  </ul>
+
+  <h3>What the Exit Script Restores</h3>
+  <ul>
+    <li>Returns X/Y/Z axis assignments to standard configuration.</li>
+    <li>Restores standard motor output order.</li>
+    <li>Restores normal steps-per-unit values for Y and Z.</li>
+    <li>Restores original limit switch assignments and limit distances.</li>
+    <li>Restores standard homing sequence.</li>
+    <li>Performs a Y/Z position swap to maintain coordinate consistency.</li>
+  </ul>
+
+  <p>
+    After exiting rotary mode, you may resume normal flat-work carving operations.
+  </p>
+
+  <hr>
+
+  <!-- Optional Transitional Section -->
+  <h2 id="next-steps-rotary-setup">Next Step: Running a Rotary Project</h2>
+  <p>
+    With Rotary Axis Mode enabled, the next stage is learning how to properly set work offsets for rotary work, 
+    mount stock, align centers, and load Rotary Axis toolpaths.  
+    This will be covered in the next chapter:  
+    <strong>“Setting Up and Running a Rotary Axis Project.”</strong>
+  </p>
+</section>
 
     <!-- Add more <article class="manual-chapter">…</article> blocks here for future chapters -->
 
