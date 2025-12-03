@@ -406,3 +406,69 @@ body.manual-page {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+/* ========= LEFT NAV STYLING UPGRADE ========= */
+
+.manual-nav {
+  background: #181c23;
+  border-radius: 12px;
+  padding: 1.25rem 1.25rem 1.5rem;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.03);
+}
+
+.manual-nav .nav-heading {
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9fa6b8;
+  margin: 0 0 0.75rem;
+}
+
+/* Remove default list styling */
+.manual-nav .nav-sections {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Section label (group header) */
+.manual-nav .nav-section {
+  margin-top: 1.1rem;
+  margin-bottom: 0.35rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7f8ba4;
+}
+
+/* Normal nav items */
+.manual-nav .nav-sections li a {
+  display: block;
+  padding: 0.28rem 0.4rem;
+  margin: 0.03rem 0;
+  font-size: 0.88rem;
+  color: #e4e7f0;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+}
+
+/* Slight indent under section headers */
+.manual-nav .nav-section + li a {
+  margin-top: 0.15rem;
+}
+
+/* Hover state */
+.manual-nav .nav-sections li a:hover {
+  background: rgba(0,191,255,0.12); /* OmniControl blue tint */
+  color: #ffffff;
+  padding-left: 0.6rem;
+}
+
+/* Optional "current" item highlight (add .is-active in HTML) */
+.manual-nav .nav-sections li a.is-active {
+  background: linear-gradient(90deg, #00bfff, #00c88a);
+  color: #05070b;
+  font-weight: 600;
+}
