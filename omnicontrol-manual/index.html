@@ -1,0 +1,3202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OmniControl – PlanetCNC TNG User & Training Manual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="manual-page">
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="site-title-block">
+      <img
+        src="assets/OmniControl_BlkBG.png"
+        alt="OmniControl · Digital Wood Carver · Powered by PlanetCNC TNG"
+        class="site-logo"
+      >
+      <div class="site-title-text">
+        <h1 class="site-title">OmniControl – PlanetCNC TNG UI</h1>
+        <p class="site-subtitle">Digital Wood Carver · User &amp; Training Manual</p>
+      </div>
+    </div>
+
+    <form id="manual-search-form" class="manual-search" role="search">
+      <label for="manual-search" class="visually-hidden">Search manual</label>
+      <input
+        type="search"
+        id="manual-search"
+        placeholder="Search manual…"
+        autocomplete="off"
+      >
+      <div id="search-count" class="search-count"></div>
+    </form>
+  </div>
+</header>
+
+<div class="manual-layout">
+
+  <!-- LEFT NAV / TABLE OF CONTENTS -->
+  <nav class="manual-nav" aria-label="Manual navigation">
+  <h2 class="nav-heading">Contents</h2>
+  <ul class="nav-sections">
+
+    <li><a href="#chapter-coordinate-systems">Coordinate Systems &amp; C1–C9 Toolbar</a></li>
+    <li><a href="#chapter-quickset">DWC Quickset Procedure (XYZ Origin)</a></li>
+    <li><a href="#chapter-set-z-zero">Reset Z Axis Zero</a></li>
+	<li><a href="#chapter-laser-router-align">Move Laser &amp; Spindle Alignment Buttons</a></li>
+	<li><a href="#chapter-enable-spindle-mode">Enable Spindle Mode (Mill Mode)</a></li>
+
+    <!-- ⭐ NEW CHAPTER ⭐ -->
+    <li><a href="#chapter-laser-mode">Laser Mode Overview</a></li>
+	<li><a href="#chapter-laser-xy-zero">Laser XY &amp; Z Work Offset Setup</a></li>
+	<li><a href="#chapter-laser-focus-6w">Focusing the DWC 6-Watt Laser</a></li>
+	<li><a href="#chapter-laser-focus-legacy-6w">Focusing the Legacy 6-Watt Laser (PLH3D-6W)</a></li>
+	<li><a href="#chapter-laser-focus-xt8">Focusing the 45-Watt XT-8 Laser</a></li>
+
+    <!-- Future chapters will go below this -->
+    <!-- <li><a href="#chapter-laser-xy-zero">Setting Laser XY Zero</a></li> -->
+    <!-- <li><a href="#chapter-focus-6w">Focusing the DWC 6-Watt Laser</a></li> -->
+    <!-- <li><a href="#chapter-focus-45w">Focusing the DWC 45-Watt Laser</a></li> -->
+
+  </ul>
+</nav>
+
+
+  <!-- MAIN MANUAL CONTENT -->
+  <main id="manual-content" class="manual-content">
+<!-- ========================================================= -->
+<!-- CHAPTER: COORDINATE SYSTEMS & LEFT TOOLBAR C1–C9          -->
+<!-- ========================================================= -->
+      <article id="chapter-coordinate-systems" class="manual-chapter">
+
+      <header class="chapter-header">
+        <h1>Coordinate Systems &amp; OmniControl Left Toolbar (C1–C9)</h1>
+        <p>
+          This chapter explains how CNC coordinate systems work in PlanetCNC TNG,
+          how OmniControl makes them easier to use with the C1–C9 buttons,
+          and how to correctly set up and edit coordinate systems so your jobs run
+          exactly where you expect.
+        </p>
+      </header>
+
+      <!-- 1. CNC COORDINATE SYSTEMS -->
+
+      <section id="cs-big-picture">
+        <h2>1. CNC Coordinate Systems – The Big Picture</h2>
+
+        <p>
+          When you run a CNC machine, the controller is always tracking position in
+          more than one coordinate system at the same time. OmniControl doesn’t
+          change how PlanetCNC TNG works—it simply makes these systems easier to
+          see and use.
+        </p>
+
+        <p>There are four main concepts to understand:</p>
+
+        <ol>
+          <li><strong>Machine Coordinate System (G53)</strong></li>
+          <li><strong>Work Coordinate Systems (G54–G59.3)</strong></li>
+          <li><strong>Work Offset</strong> (a temporary shift, similar to G92)</li>
+          <li><strong>Tool &amp; Axis Offsets, and Transformations</strong></li>
+        </ol>
+
+        <section id="cs-machine">
+          <h3>1.1 Machine Coordinates (G53)</h3>
+          <p>
+            The <strong>machine coordinate system</strong> is the controller’s
+            internal reference frame. Its origin (0,0,0) is defined by the machine
+            builder and the homing switches. When you <strong>Home</strong> the
+            machine, TNG re-finds this internal origin.
+          </p>
+          <p>
+            You normally do <em>not</em> program directly in machine coordinates,
+            because the origin is often at the back or corner of the machine—far
+            away from your actual part. Think of machine coordinates as the CNC’s
+            own GPS grid for the entire travel envelope.
+          </p>
+        </section>
+
+        <section id="cs-work">
+          <h3>1.2 Work Coordinate Systems (G54–G59.3)</h3>
+          <p>
+            To make programming practical, we use <strong>work coordinate
+            systems</strong>. Each one defines a convenient origin on or near your
+            part, jig, or fixture. PlanetCNC TNG supports many work coordinate
+            systems:
+          </p>
+          <ul>
+            <li><strong>G54–G59</strong> – Work coordinate systems 1–6</li>
+            <li><strong>G59.1–G59.3</strong> – Work coordinate systems 7–9</li>
+          </ul>
+          <p>
+            In OmniControl, these nine systems are mapped to the
+            <strong>C1–C9 buttons</strong> on the left toolbar:
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Button</th>
+                <th>Coordinate System</th>
+                <th>Standard G-code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>C1</td><td>Work Coordinate System 1</td><td>G54</td></tr>
+              <tr><td>C2</td><td>Work Coordinate System 2</td><td>G55</td></tr>
+              <tr><td>C3</td><td>Work Coordinate System 3</td><td>G56</td></tr>
+              <tr><td>C4</td><td>Work Coordinate System 4</td><td>G57</td></tr>
+              <tr><td>C5</td><td>Work Coordinate System 5</td><td>G58</td></tr>
+              <tr><td>C6</td><td>Work Coordinate System 6</td><td>G59</td></tr>
+              <tr><td>C7</td><td>Work Coordinate System 7</td><td>G59.1</td></tr>
+              <tr><td>C8</td><td>Work Coordinate System 8</td><td>G59.2</td></tr>
+              <tr><td>C9</td><td>Work Coordinate System 9</td><td>G59.3</td></tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-tip">
+            <p>
+              <strong>Why use multiple work coordinate systems?</strong><br>
+              They are ideal for multi-fixture jobs, multiple vises, jigs with
+              several stations, rotary setups, or simply keeping a “standard” table
+              origin and one or more dedicated fixture origins.
+            </p>
+          </div>
+        </section>
+
+        <section id="cs-work-offset">
+          <h3>1.3 Work Offset (Temporary Shift)</h3>
+          <p>
+            On top of the chosen work coordinate system, PlanetCNC supports a
+            <strong>work offset</strong>—a temporary shift that says “treat the
+            current position as some other coordinate value.” This is similar in
+            spirit to a G92 offset.
+          </p>
+          <p>
+            Work offsets are useful for minor temporary adjustments or special
+            probing routines. In OmniControl, work offsets are displayed in the
+            <strong>Offset</strong> tab under the
+            <strong>Work Offset</strong> section.
+          </p>
+        </section>
+
+        <section id="cs-tool-other">
+          <h3>1.4 Tool Offsets and Other Layers</h3>
+          <p>
+            The final position the machine moves to is the result of several
+            layers combined:
+          </p>
+          <ol>
+            <li>Machine coordinates (G53)</li>
+            <li>Coordinate System (G54–G59.3)</li>
+            <li>Work Offset (temporary shift)</li>
+            <li>Tool Offset (tool length and optional XYZ)</li>
+            <li>Axis Offset and Transformations (warp, rotate, etc.)</li>
+          </ol>
+          <p>
+            OmniControl doesn’t change this math—it simply shows each layer in one
+            place on the <strong>Offset</strong> tab, and lets you quickly choose
+            the active work coordinate system using C1–C9.
+          </p>
+        </section>
+      </section>
+
+      <!-- 2. LEFT TOOLBAR C1–C9 -->
+
+      <section id="left-toolbar-cs">
+        <h2>2. OmniControl Left Toolbar – Coordinate System Buttons (C1–C9)</h2>
+
+        <p>
+          The C1–C9 buttons on the left toolbar are OmniControl’s shortcut to
+          PlanetCNC TNG’s work coordinate systems. These buttons are identical on
+          all Digital Wood Carver CNC models—only the top and right toolbars vary
+          between machines.
+        </p>
+
+        <figure class="figure-inline">
+          <img src="assets/IMG_CS_1.svg" alt="C1 – G54 coordinate system button">
+          <img src="assets/IMG_CS_2.svg" alt="C2 – G55 coordinate system button">
+          <img src="assets/IMG_CS_3.svg" alt="C3 – G56 coordinate system button">
+          <img src="assets/IMG_CS_4.svg" alt="C4 – G57 coordinate system button">
+          <img src="assets/IMG_CS_5.svg" alt="C5 – G58 coordinate system button">
+          <img src="assets/IMG_CS_6.svg" alt="C6 – G59 coordinate system button">
+          <img src="assets/IMG_CS_7.svg" alt="C7 – G59.1 coordinate system button">
+          <img src="assets/IMG_CS_8.svg" alt="C8 – G59.2 coordinate system button">
+          <img src="assets/IMG_CS_9.svg" alt="C9 – G59.3 coordinate system button">
+          <figcaption>
+            OmniControl coordinate system buttons C1–C9. Each one selects a work
+            coordinate system (G54–G59.3).
+          </figcaption>
+        </figure>
+
+        <section id="left-toolbar-mapping">
+          <h3>2.1 Button Mapping</h3>
+          <p>The mapping between buttons and coordinate systems is:</p>
+          <ul>
+            <li><strong>C1 → G54</strong> – Default work coordinate system</li>
+            <li><strong>C2 → G55</strong></li>
+            <li><strong>C3 → G56</strong></li>
+            <li><strong>C4 → G57</strong></li>
+            <li><strong>C5 → G58</strong></li>
+            <li><strong>C6 → G59</strong></li>
+            <li><strong>C7 → G59.1</strong></li>
+            <li><strong>C8 → G59.2</strong></li>
+            <li><strong>C9 → G59.3</strong></li>
+          </ul>
+
+          <div class="callout callout-tip">
+            <p>
+              Many shops adopt a “house rule” for these buttons, for example:
+              C1/G54 for main spoilboard origin, C2/G55 for left vise,
+              C3/G56 for right vise, C4/G57 for rotary origin, and so on.
+              Consistent use reduces mistakes.
+            </p>
+          </div>
+        </section>
+
+        <section id="left-toolbar-selecting">
+          <h3>2.2 Selecting a Coordinate System with C1–C9</h3>
+          <ol>
+            <li>
+              Make sure the machine is homed and ready for operation.
+            </li>
+            <li>
+              On the left toolbar, click the desired <strong>C#</strong> button.
+              The selected button will highlight.
+            </li>
+            <li>
+              PlanetCNC TNG activates the corresponding work coordinate system
+              (G54–G59.3).
+            </li>
+            <li>
+              The <strong>Offset</strong> tab in the State Panel updates to show
+              the offsets associated with that system.
+            </li>
+          </ol>
+          <p>
+            From this point on, all jogging, zeroing, and most G-code moves are
+            interpreted in the chosen work coordinate system.
+          </p>
+        </section>
+      </section>
+
+      <!-- 3. SETTING UP & EDITING COORDINATE SYSTEMS -->
+
+      <section id="cs-setup-edit">
+        <h2>3. Setting Up &amp; Editing Coordinate Systems</h2>
+
+        <p>
+          Before OmniControl’s C1–C9 coordinate system buttons can be used
+          effectively, each coordinate system must be configured. This tells the
+          controller where each fixture, jig, vise location, or machining origin
+          exists in physical space.
+        </p>
+
+        <p>
+          All coordinate system locations are defined
+          <strong>relative to Machine Coordinates (G53)</strong>. Machine
+          coordinates represent the CNC’s internal “absolute map” of the table,
+          which becomes valid immediately after <strong>Homing</strong>.
+        </p>
+
+        <p>
+          OmniControl makes switching systems easy with C1–C9, but the creation
+          and editing of these systems occurs in the standard PlanetCNC TNG
+          interface:
+        </p>
+
+        <p>
+          <span class="kbd">Machine</span> &rarr;
+          <span class="kbd">Coordinate System</span> &rarr;
+          <span class="kbd">Edit Coordinate Systems…</span>
+        </p>
+
+        <section id="cs-editor-open">
+          <h3>3.1 Opening the Coordinate System Editor</h3>
+          <ol>
+            <li>On the top menu bar, click <span class="kbd">Machine</span>.</li>
+            <li>Hover over <span class="kbd">Coordinate System</span>.</li>
+            <li>Click <span class="kbd">Edit Coordinate Systems…</span>.</li>
+            <li>
+              The Coordinate System Editor window appears, showing a list of
+              systems on the left and properties for the selected system on the
+              right.
+            </li>
+          </ol>
+        </section>
+
+        <section id="cs-editor-principle">
+          <h3>3.2 How Coordinate Systems Are Defined</h3>
+          <p>
+            Coordinate system offsets (G54–G59.3) are always based on the
+            <strong>current machine position (G53)</strong> at the time of setup.
+          </p>
+          <p>The workflow is:</p>
+          <ol>
+            <li>Home the machine.</li>
+            <li>Jog to the desired zero point for that coordinate system.</li>
+            <li>
+              Open the Coordinate System Editor and manually enter the machine
+              coordinates displayed on the DRO.
+            </li>
+          </ol>
+          <p>
+            These values become the offset values for the chosen coordinate
+            system. This modern workflow replaces the older “Copy From” method
+            shown in some outdated documentation.
+          </p>
+        </section>
+
+        <section id="cs-editor-create">
+          <h3>3.3 Creating or Setting a Coordinate System</h3>
+
+          <h4>Step 1 – Home the Machine</h4>
+          <p>
+            Homing establishes the machine coordinate system (G53). Without
+            homing, coordinate system setup will be inaccurate and unsafe.
+          </p>
+
+          <h4>Step 2 – Jog to the Desired Origin</h4>
+          <p>
+            Move the spindle to the exact location you want to define as the
+            coordinate system’s zero point. This might be the corner of a
+            spoilboard, a vise origin, a rotary axis center, or a jig position.
+          </p>
+
+          <h4>Step 3 – Open the Coordinate System Editor</h4>
+          <p>
+            Use the menu:
+            <span class="kbd">Machine</span> &rarr;
+            <span class="kbd">Coordinate System</span> &rarr;
+            <span class="kbd">Edit Coordinate Systems…</span>
+          </p>
+
+          <h4>Step 4 – Select the Coordinate System Number</h4>
+          <p>
+            In the editor, click the system number you want to set:
+          </p>
+          <ul>
+            <li>1 &rarr; G54 &rarr; OmniControl C1</li>
+            <li>2 &rarr; G55 &rarr; OmniControl C2</li>
+            <li>… up to …</li>
+            <li>9 &rarr; G59.3 &rarr; OmniControl C9</li>
+          </ul>
+
+          <h4>Step 5 – Give the System a Meaningful Name</h4>
+          <p>
+            In the <strong>Name</strong> box, enter something descriptive, such as
+            “Main Origin – Default”, “Left Vise”, “Rotary Axis”, or “Fixture 2”.
+            Clear naming reduces mistakes during production.
+          </p>
+
+          <h4>Step 6 – Manually Enter the Machine Coordinates</h4>
+          <p>
+            Look at the <strong>Machine Position (G53) DRO</strong> on the left
+            side of OmniControl. These values show your current position in machine
+            space, for example:
+          </p>
+          <pre><code>X: 5.2396
+Y: 5.2396
+Z: -4.5000
+</code></pre>
+          <p>
+            Enter these values into the corresponding <strong>Offset</strong>
+            fields in the editor (X, Y, Z, and any additional axes used). This
+            defines where the coordinate system “lives” in machine space.
+          </p>
+
+          <h4>Step 7 – Apply the New or Updated Coordinate System</h4>
+          <p>
+            The editor includes two important buttons:
+          </p>
+          <ul>
+            <li>
+              <strong>Circle with a plus (⊕)</strong> – Creates or sets a
+              <em>new</em> coordinate system using the values you entered.
+            </li>
+            <li>
+              <strong>Circle with a dot (⊙)</strong> – <em>Updates</em> an
+              existing coordinate system with your new values.
+            </li>
+          </ul>
+          <p>
+            Use the plus button when defining a system for the first time, and the
+            dot button when modifying or correcting a system that already exists.
+          </p>
+
+          <h4>Step 8 – Save and Close</h4>
+          <p>
+            Click the checkmark (<strong>✔</strong>) in the upper-right corner of
+            the editor to commit your changes and close the window. Your new or
+            updated coordinate system is now active and ready to use.
+          </p>
+        </section>
+
+        <section id="cs-editor-verify">
+          <h3>3.4 Verifying the Coordinate System</h3>
+          <ol>
+            <li>Click the corresponding <strong>C1–C9</strong> button in OmniControl.</li>
+            <li>Open the <strong>Offset</strong> tab in the State Panel.</li>
+            <li>Confirm that:
+              <ul>
+                <li><strong>CoordSys Num</strong> shows the correct number.</li>
+                <li><strong>CoordSys X/Y/Z</strong> match the values you entered.</li>
+                <li><strong>Work Offset X/Y/Z</strong> are zero unless intentionally used.</li>
+                <li>The correct <strong>Tool Offset</strong> is active for the current tool.</li>
+              </ul>
+            </li>
+          </ol>
+          <p>
+            If anything looks incorrect, fix it before running a job.
+          </p>
+        </section>
+
+        <section id="cs-editor-best-practices">
+          <h3>3.5 Best Practices for Digital Wood Carver Users</h3>
+          <ul>
+            <li><strong>Always home before editing</strong> coordinate systems.</li>
+            <li>
+              <strong>Name each system clearly</strong> (for example “Rotary Axis
+              Origin” instead of “System 6”).
+            </li>
+            <li>
+              <strong>Keep C1/G54 as your primary default</strong> table or
+              spoilboard origin whenever possible.
+            </li>
+            <li>
+              <strong>Use the Offset tab as the truth source</strong> if a job
+              doesn’t move where you expect.
+            </li>
+          </ul>
+        </section>
+      </section>
+
+      <!-- 4. OFFSET TAB -->
+
+      <section id="offset-tab">
+        <h2>4. The Offset Tab – Seeing What’s Really Active</h2>
+        <p>
+          When you’re working with multiple coordinate systems and offsets, it’s
+          easy to get lost. The <strong>Offset</strong> tab in OmniControl is your
+          “truth detector.” It shows each layer that affects motion.
+        </p>
+
+        <p>From top to bottom, you will see:</p>
+
+        <ol>
+          <li>
+            <strong>Tool Offset</strong> – Indicates whether a tool offset is
+            active and shows Tool Offset X/Y/Z values.
+          </li>
+          <li>
+            <strong>Coordinate System</strong> – Shows whether a coordinate system
+            is active, the <strong>CoordSys Num</strong> (1–9) and
+            <strong>CoordSys X/Y/Z/Rot</strong> values.
+          </li>
+          <li>
+            <strong>Work Offset</strong> – Displays any temporary work offsets
+            applied on top of the coordinate system.
+          </li>
+          <li>
+            <strong>Axis Offset</strong> – Permanent axis-level corrections or
+            shifts (normally zero for most users).
+          </li>
+          <li>
+            <strong>Transformation</strong> – Flags for
+            <em>Trans Enabled</em> and <em>Warp Enabled</em>, along with the
+            associated Z extents. For most new users, these remain off.
+          </li>
+        </ol>
+
+        <div class="callout callout-tip">
+          <p>
+            If your machine is not going where you expect, open the
+            <strong>Offset</strong> tab and check:
+            Is the correct coordinate system active?
+            Are Work Offsets zero unless needed?
+            Is a Tool Offset active that you planned for?
+            Are Transformations disabled unless you specifically enabled them?
+          </p>
+        </div>
+
+        <p>
+          OmniControl’s C1–C9 buttons and the Offset tab work together: you
+          <strong>select</strong> the system you want with the buttons, and
+          <strong>verify</strong> what’s truly active using the Offset tab.
+        </p>
+      </section>
+
+    </article>
+    <!-- /chapter-coordinate-systems -->
+
+<!-- ========================================================= -->
+<!-- DWC Quickset Procedure – XYZ Origin Button                -->
+<!-- ========================================================= -->
+
+<article id="chapter-quickset" class="manual-chapter">
+  <header class="chapter-header">
+    <h1>DWC Quickset Procedure – XYZ Origin Button</h1>
+    <p>
+      The DWC Quickset Procedure is an OmniControl-exclusive setup routine that automatically
+      sets the <strong>X, Y, and Z Work Offset Origin</strong> for your job using the
+      DWC Quickset Zeroing Tool. This section explains when to use it, how to prepare your
+      machine, and how to run the procedure safely for all Digital Wood Carver models.
+    </p>
+  </header>
+
+  <figure class="figure-inline">
+    <img src="assets/IMG_BTN_XYZ_Origin.svg" alt="DWC Quickset (XYZ Origin) top-toolbar button">
+    <figcaption>
+      OmniControl <strong>DWC Quickset Procedure</strong> button (XYZ Origin).
+      Clicking this button starts the guided Quickset setup workflow.
+    </figcaption>
+  </figure>
+
+  <h2>1. What the DWC Quickset Procedure Does</h2>
+  <p>
+    The DWC Quickset Procedure automatically locates the <strong>front-left corner</strong> of
+    your material and sets it as the active work coordinate system origin
+    (for example G54 when C1 is selected). During the routine, OmniControl uses the
+    DWC Quickset Zeroing Tool block and either an endmill or the supplied 0.250&quot;
+    Touch Pin dowel to probe the block and calculate:
+  </p>
+  <ul>
+    <li><strong>X Work Offset</strong> – front-left X edge of the material</li>
+    <li><strong>Y Work Offset</strong> – front-left Y edge of the material</li>
+    <li><strong>Z Work Offset</strong> – top surface of the material</li>
+  </ul>
+  <p>
+    When the routine is complete and the block is removed, your CNC is ready to run the
+    project with an accurate, repeatable origin.
+  </p>
+
+  <h2>2. When to Use the Quickset Procedure</h2>
+  <p>Use the DWC Quickset Procedure when you want:</p>
+  <ul>
+    <li>Fast, repeatable setup of the <strong>front-left corner</strong> as your origin</li>
+    <li>Automatic setting of <strong>X, Y, and Z</strong> work offsets</li>
+    <li>Consistent setup for sheet goods, blocks, and jigs</li>
+    <li>To recover a known origin after a tool change or new setup</li>
+  </ul>
+  <p>
+    The Quickset routine is especially helpful for new CNC users, because OmniControl
+    guides every step and minimizes manual zeroing errors.
+  </p>
+
+  <h2>3. Required Setup Before Running Quickset</h2>
+  <p>
+    Before you click the Quickset button, make sure <strong>all</strong> of the following
+    conditions are met.
+  </p>
+
+  <h3>3.1 Place the DWC Quickset Zeroing Tool</h3>
+  <p>
+    Position the Quickset Block on the <strong>front-left corner of your material</strong>.
+    Align the two reference faces of the block with the front and left edges of the stock.
+  </p>
+
+  <h3>3.2 Install a Valid Tool (Endmill or Touch Pin)</h3>
+  <p>
+    The Quickset routine can be performed with:
+  </p>
+  <ul>
+    <li>
+      An <strong>endmill</strong> up to <strong>2.000&quot; diameter</strong> with a
+      straight cutting edge, or
+    </li>
+    <li>
+      The supplied <strong>0.250&quot; Touch Pin dowel</strong> that ships with the
+      DWC Quickset Zeroing Tool.
+    </li>
+  </ul>
+  <p>
+    If your initial cutting tool is a V-bit, tapered ball nose, form tool, or any bit that
+    does <strong>not</strong> have a straight sidewall, you must use the Touch Pin for
+    the Quickset operation. You will then swap to the actual cutting tool during the
+    guided sequence.
+  </p>
+
+  <h3>3.3 Position the Spindle for the Start Point</h3>
+  <p>
+    Before starting the Quickset routine:
+  </p>
+  <ul>
+    <li>Jog the machine so the <strong>center of the tool</strong> is directly over the
+      <strong>corner hole</strong> in the Quickset Block.</li>
+    <li>Ensure the <strong>tip of the tool</strong> is above the top surface of the block
+      (not touching it).</li>
+    <li>Verify there is enough clearance for motion in X, Y, and Z.</li>
+  </ul>
+
+  <h3>3.4 Model-Specific Electrical Setup</h3>
+  <p>
+    Different DWC models handle continuity and grounding for probing in different ways.
+    Use the instructions below that match your machine.
+  </p>
+
+  <h4>3.4.1 DWC1824 – Requires Both Clips</h4>
+  <p>
+    On the DWC1824, the Quickset Block is <strong>not wired directly</strong> to the
+    controller, so you must transfer the continuity circuit through the standard Z-touch
+    system:
+  </p>
+  <ul>
+    <li>
+      Clip the <strong>Quickset Block Gator Clip</strong> to the machine&rsquo;s
+      <strong>Z-Zeroing Touch Plate</strong>.<br>
+      <em>This transfers the Output&nbsp;2 continuity signal into the Quickset Block.</em>
+    </li>
+    <li>
+      Clip the <strong>Z-Zeroing Ground Clip</strong> to the
+      <strong>router bit shank</strong>.<br>
+      <em>This completes the circuit back to the controller.</em>
+    </li>
+  </ul>
+  <p>Both clips are required for the Quickset routine to detect contact on a DWC1824.</p>
+
+  <h4>3.4.2 DWC2440 – Quickset Clip Only</h4>
+  <p>
+    On the DWC2440, the Quickset Block is also not wired directly to the controller,
+    but the machine ground is handled differently:
+  </p>
+  <ul>
+    <li>
+      Clip the <strong>Quickset Block Gator Clip</strong> to the machine&rsquo;s
+      <strong>Z-Zeroing Touch Plate</strong>.
+    </li>
+    <li>
+      The Z-Zeroing system&rsquo;s <strong>ground lead</strong> is permanently
+      attached to the <strong>machine leg</strong> and does not need to be moved
+      to the router bit.
+    </li>
+  </ul>
+  <p>
+    No additional ground connection to the bit is required on the DWC2440.
+  </p>
+
+  <h4>3.4.3 DWC2636 &amp; DWC3648 – Direct-Wired Quickset Block</h4>
+  <p>
+    On the DWC2636 and DWC3648, the Quickset Block is
+    <strong>hardwired directly</strong> to the controller:
+  </p>
+  <ul>
+    <li>No Gator clips required.</li>
+    <li>No grounding steps or special wiring.</li>
+  </ul>
+  <p>Simply place the block and run the Quickset routine.</p>
+
+  <h4>3.4.4 DWC4848 &amp; DWC5100 – Ceramic Spindle Grounding Magnet</h4>
+  <p>
+    The DWC4848 and DWC5100 use spindles with <strong>ceramic bearings</strong>, which do not
+    naturally conduct electricity through the spindle body. In order for the Quickset routine
+    to detect contact, a special <strong>grounding magnet</strong> must be used:
+  </p>
+  <ul>
+    <li>
+      Attach the <strong>Grounding Magnet</strong> to either the
+      <strong>spindle collet nut</strong> or directly to the
+      <strong>tool shank/router bit</strong>.
+    </li>
+    <li>
+      Make sure the magnet is firmly attached and the cable is safely routed away
+      from moving parts.
+    </li>
+  </ul>
+  <p>
+    The Quickset Block itself is wired directly to the controller on these machines,
+    so only the grounding magnet is required.
+  </p>
+
+  <h4>3.4.5 Summary – Model Setup Matrix</h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Quickset Block Wiring</th>
+        <th>Required Setup</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>DWC1824</strong></td>
+        <td>Not wired</td>
+        <td>Block clip to Z plate, ground clip to bit shank</td>
+      </tr>
+      <tr>
+        <td><strong>DWC2440</strong></td>
+        <td>Not wired</td>
+        <td>Block clip to Z plate, ground permanently on machine leg</td>
+      </tr>
+      <tr>
+        <td><strong>DWC2636</strong></td>
+        <td>Direct wired</td>
+        <td>No clips or grounding steps required</td>
+      </tr>
+      <tr>
+        <td><strong>DWC3648</strong></td>
+        <td>Direct wired</td>
+        <td>No clips or grounding steps required</td>
+      </tr>
+      <tr>
+        <td><strong>DWC4848</strong></td>
+        <td>Direct wired</td>
+        <td>Attach grounding magnet to collet nut or bit</td>
+      </tr>
+      <tr>
+        <td><strong>DWC5100</strong></td>
+        <td>Direct wired</td>
+        <td>Attach grounding magnet to collet nut or bit</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. Starting the DWC Quickset Procedure</h2>
+  <p>
+    With the Quickset Block placed, the correct tool installed, the spindle positioned over the
+    corner hole, and the electrical setup verified for your model, you are ready to run the
+    Quickset routine.
+  </p>
+  <p>
+    Click the <strong>DWC Quickset (XYZ Origin)</strong> button on the top toolbar. OmniControl
+    opens the first dialog in the Quickset workflow.
+  </p>
+
+  <figure class="figure-large">
+  <img src="assets/DWC_Quickset_Procedure_Pop_up.png" alt="DWC Quickset Procedure main dialog showing tool type selection">
+  <figcaption>
+    Initial Quickset dialog – choose <strong>Endmill</strong> or
+    <strong>Touch Pin</strong> to match the tool currently installed in the spindle.
+  </figcaption>
+</figure>
+
+  <h3>4.1 Select the Tool Type</h3>
+  <p>
+    In the first Quickset dialog, select the tool you will use for the probing routine:
+  </p>
+  <ul>
+    <li><strong>Endmill</strong> – for straight-wall tools up to 2.000&quot; diameter</li>
+    <li><strong>Touch Pin</strong> – for the 0.250&quot; dowel pin included with the Quickset accessory</li>
+  </ul>
+  <p>
+    After making your choice, click the <strong>OK</strong> button
+    (<span class="kbd">✔</span> in the upper-right corner) to continue.
+  </p>
+
+  <div class="callout callout-tip">
+    <strong>Tip:</strong> If your first cutting tool is a V-bit, tapered ball nose, form tool, or
+    any non-straight cutter, always choose <strong>Touch Pin</strong>. You will install the actual
+    cutting tool later in the guided sequence.
+  </div>
+
+  <h2>5. Quickset Workflow – Endmill Mode</h2>
+
+  <figure class="figure-large">
+  <img src="assets/DWC_Quickset_Procedure_Pop_up_Endmill.png" alt="Endmill Offset Procedure dialog">
+  <figcaption>
+    Endmill Offset Procedure – enter the exact diameter of your endmill before starting the routine.
+  </figcaption>
+</figure>
+
+  <h3>5.1 Enter the Endmill Diameter</h3>
+  <p>
+    When <strong>Endmill</strong> is selected, OmniControl displays the
+    <strong>Endmill Offset Procedure</strong> window. Enter the exact cutting diameter:
+  </p>
+  <ul>
+    <li>Use decimal format, e.g. <code>0.250</code>, <code>0.500</code>, <code>1.000</code>, <code>2.000</code>.</li>
+    <li>The maximum allowed diameter is <strong>2.000&quot;</strong>.</li>
+  </ul>
+  <p>
+    After entering the diameter, click <strong>OK</strong>
+    (<span class="kbd">✔</span>) to begin the motion sequence.
+  </p>
+
+  <h3>5.2 Endmill Touch Sequence (Z, then X, then Y)</h3>
+  <p>OmniControl performs the following steps automatically:</p>
+  <ol>
+    <li>
+      Move the endmill to the <strong>center of the Quickset Block</strong> and
+      gently touch the top surface to establish the initial
+      <strong>Z Work Offset reference</strong>.
+    </li>
+    <li>
+      Move in X and touch the <strong>X-reference face</strong> of the block
+      to calculate the X Work Offset.
+    </li>
+    <li>
+      Move in Y and touch the <strong>Y-reference face</strong> of the block
+      to calculate the Y Work Offset.
+    </li>
+    <li>
+      Apply the computed <strong>X, Y, and Z Work Offsets</strong> to the currently
+      active coordinate system (C1–C9 / G54–G59.3).
+    </li>
+  </ol>
+  <p>
+    When the routine finishes, the spindle will stop at a safe location. You may remove
+    the Quickset Block and begin machining your project.
+  </p>
+
+  <h2>6. Quickset Workflow – Touch Pin Mode</h2>
+
+  <figure class="figure-large">
+  <img src="assets/DWC_Quickset_Procedure_Pop_up_Touch_Pin.png" alt="Touch Pin Offset Procedure dialog showing tool change location fields">
+  <figcaption>
+    Touch Pin Offset Procedure – enter a safe Tool Change Location for the automatic move between probing and tool change.
+  </figcaption>
+</figure>
+
+  <h3>6.1 Enter the Tool Change Location</h3>
+  <p>
+    When <strong>Touch Pin</strong> is selected, OmniControl displays the
+    <strong>Touch Pin Offset Procedure</strong> window. You must specify a
+    <strong>Tool Change Location</strong> where the machine will move after probing
+    X and Y so you can safely swap tools:
+  </p>
+  <ul>
+    <li><strong>X</strong> – Safe X position for changing tools</li>
+    <li><strong>Y</strong> – Safe Y position for changing tools</li>
+    <li><strong>Z</strong> – Clearance Z height above the work area</li>
+  </ul>
+  <p>
+    Choose a location that is clear of clamps, fixtures, and the Quickset Block and that
+    provides comfortable access to the tool. Click <strong>OK</strong>
+    (<span class="kbd">✔</span>) to start the routine.
+  </p>
+
+  <h3>6.2 Touch Pin Motion Sequence (Z, then X, then Y)</h3>
+  <p>
+    With the Touch Pin installed, OmniControl runs the following sequence:
+  </p>
+  <ol>
+    <li>
+      Move to the <strong>center of the Quickset Block</strong> and touch the
+      top surface to establish an initial safe <strong>Z reference</strong>.
+    </li>
+    <li>
+      Move in X and touch the <strong>X-reference face</strong> of the block.
+    </li>
+    <li>
+      Move in Y and touch the <strong>Y-reference face</strong> of the block.
+    </li>
+    <li>
+      Move to the specified <strong>Tool Change Location</strong> and automatically
+      <strong>pause</strong>.
+    </li>
+  </ol>
+
+  <h3>6.3 User Tool Change</h3>
+  <p>
+    At the Tool Change Location:
+  </p>
+  <ul>
+    <li>Remove the Touch Pin from the spindle.</li>
+    <li>Install the actual cutting tool you will use for your job.</li>
+    <li>Press the <strong>Pause</strong> button again to resume the Quickset routine.</li>
+  </ul>
+
+  <h3>6.4 Final Z Touch and Offset Application</h3>
+  <p>
+    After resuming, OmniControl:
+  </p>
+  <ol>
+    <li>Returns to the Quickset Block.</li>
+    <li>
+      Touches the <strong>top surface</strong> again with the actual cutting tool to set the
+      final <strong>Z Work Offset</strong>.
+    </li>
+    <li>
+      Applies the computed <strong>X, Y, and Z Work Offsets</strong> to the active
+      coordinate system.
+    </li>
+  </ol>
+  <p>
+    Once complete, remove the Quickset Block. Your origin is now fully defined and the
+    machine is ready to run the toolpath.
+  </p>
+
+  <h2>7. Safety – Exiting a Quickset Dialog</h2>
+  <div class="callout">
+    <p>
+      <strong>Important:</strong> Every Quickset dialog includes an
+      <strong>OK (✔)</strong> button in the top-right corner. Clicking this button
+      confirms the operation and starts automatic machine motion.
+    </p>
+    <p>
+      If you clicked the Quickset button by mistake or decide not to run the procedure:
+    </p>
+    <ul>
+      <li><strong>Do not</strong> click OK.</li>
+      <li>Press the keyboard <span class="kbd">Esc</span> key to cancel and close the dialog.</li>
+    </ul>
+    <p>
+      Always make sure the Quickset Block is in the correct position, clips or grounding
+      accessories are installed (if required for your model), and the area is clear before
+      starting the routine.
+    </p>
+  </div>
+
+  <h2>8. After the Quickset Procedure</h2>
+  <p>
+    When the Quickset routine is finished:
+  </p>
+  <ul>
+    <li>Remove the DWC Quickset Zeroing Tool block from the work area.</li>
+    <li>Verify that the correct coordinate system (C1–C9) is active.</li>
+    <li>
+      Optionally jog to <strong>X0 Y0 Z0</strong> in the work coordinate system to visually
+      confirm the origin location at the lower-left corner of your material.
+    </li>
+  </ul>
+  <p>
+    At this point the machine is fully set up and ready to run your project using the new
+    work offset origin.
+  </p>
+</section>
+</article>
+<!-- /chapter-quickset -->
+
+<!-- ========================================================= -->
+<!-- CHAPTER: Set Z Zero (Reset Z Axis Zero After Tool Change) -->
+<!-- ========================================================= -->
+
+<article id="chapter-set-z-zero" class="manual-chapter">
+
+  <h1>Set Z Zero – Resetting Z After a Manual Tool Change</h1>
+
+  <p>
+    The <strong>Set Z Zero</strong> button provides a fast, automated, and highly accurate method
+    to re-establish your <strong>Z-axis work offset</strong> after a manual tool change.  
+    This routine ensures the new tool is zeroed to the exact same Z reference that was established
+    earlier using the DWC Quickset XYZ Origin Procedure.
+  </p>
+
+  <p>
+    Use this routine anytime your project requires more than one cutting tool.  
+    Only <strong>Z</strong> is affected — X and Y remain unchanged.
+  </p>
+
+  <!-- ------------------------------ -->
+  <!-- SECTION 1: When to Use         -->
+  <!-- ------------------------------ -->
+
+  <h2>1. When to Use Set Z Zero</h2>
+
+  <p>Typical situations where this tool is required:</p>
+
+  <ul>
+    <li>Switching from a roughing bit to a finishing bit</li>
+    <li>Changing V-bit angles (e.g., 90° → 60°)</li>
+    <li>Changing from endmill → ball nose → tapered bit</li>
+    <li>Any tool change where tool length differs (most cases)</li>
+  </ul>
+
+  <p>
+    The Set Z Zero function updates <strong>only the Z-axis work offset</strong>.  
+    Your X and Y origins remain exactly as they were.
+  </p>
+
+  <!-- ------------------------------ -->
+  <!-- SECTION 2: Required Setup       -->
+  <!-- ------------------------------ -->
+
+  <h2>2. Required Setup Before Running the Operation</h2>
+
+  <p>For accuracy and safety, complete the following:</p>
+
+  <h3>2.1 Place the DWC Quickset Zeroing Tool Block</h3>
+
+  <p>
+    Place the Quickset block in the <strong>exact same location</strong> used during the original XYZ Origin procedure.
+    (See: <em>DWC Quickset Procedure – XYZ Origin Button → Section 3.1</em>)
+  </p>
+
+  <h3>2.2 Install Your New Tool</h3>
+
+  <p>
+    After the previous toolpath completes, install the next tool you intend to use and ensure it is clamped securely in the collet.
+  </p>
+
+  <h3>2.3 Ensure the Tool is Elevated (No Need to Move to the Block Manually)</h3>
+
+  <p>
+    The tool can be located <strong>anywhere on the table</strong> when you start the Set Z Zero routine.
+    The only requirement is:
+  </p>
+
+  <ul>
+    <li>The tool tip must be <strong>positioned higher</strong> than the top of the Quickset block</li>
+    <li>You must ensure the spindle has clearance from clamps or fixtures during travel</li>
+  </ul>
+
+  <p>
+    When the routine begins, OmniControl automatically performs an <strong>absolute X/Y move</strong> to return
+    the spindle directly above the Quickset block before probing begins.
+  </p>
+
+  <!-- ------------------------------ -->
+  <!-- SECTION 3: Grounding Notes     -->
+  <!-- ------------------------------ -->
+
+  <h2>3. Grounding & Electrical Contact Requirements (Model-Specific)</h2>
+
+  <p>
+    The Quickset block relies on continuity between the tool and the block.  
+    Certain DWC machines require different grounding configurations:
+  </p>
+
+  <ul>
+    <li><strong>DWC1824:</strong>  
+      Clip the Quickset block’s gator clip to the machine’s Z-Zero touch plate.  
+      Clip the machine’s touch-plate ground clip to the router bit’s shank.
+    </li>
+
+    <li><strong>DWC2440:</strong>  
+      Clip the Quickset block’s gator clip to the machine’s Z-Zero touch plate.  
+      The machine’s ground clip attaches to the <strong>leg of the CNC frame</strong> (not the bit).
+    </li>
+
+    <li><strong>DWC4848 & DWC5100 (ceramic-bearing spindles):</strong>  
+      Attach the included <strong>grounding magnet</strong> to the spindle’s collet nut or to the installed tool.
+      These spindles cannot conduct through bearings, so the magnet is required.
+    </li>
+
+    <li><strong>All other units:</strong>  
+      The Quickset block is wired directly to the controller and does not require special grounding steps.
+    </li>
+  </ul>
+
+  <!-- ------------------------------ -->
+  <!-- SECTION 4: Running Routine     -->
+  <!-- ------------------------------ -->
+
+  <h2>4. Running the Set Z Zero Routine</h2>
+
+  <p>
+    Press the <strong>Set Z Zero</strong> button in the top toolbar.  
+    OmniControl will display a confirmation popup before beginning.
+  </p>
+
+  <h3>4.1 Confirmation Popup (Reset Z Axis Zero)</h3>
+
+  <figure class="figure-large">
+  <img src="assets/DWC_Quickset_Reset_Z.png" alt="Reset Z Axis Zero popup dialog">
+  <figcaption>DWC Quickset – Reset Z Axis Zero confirmation window.</figcaption>
+</figure>
+
+  <p>The popup gives the user two choices:</p>
+
+  <ul>
+    <li><strong>Press OK (✔)</strong> — Runs the Set Z Zero procedure immediately.</li>
+    <li><strong>Press ESC (keyboard)</strong> — Cancels the operation safely.</li>
+  </ul>
+
+  <h3>4.2 What the Routine Does Automatically</h3>
+
+  <p>After pressing OK, OmniControl will:</p>
+
+  <ol>
+    <li><strong>Move the spindle automatically</strong> to the Quickset block’s saved X/Y location</li>
+    <li>Lower the tool until it contacts the block</li>
+    <li>Calculate and store the <strong>new Z-axis work offset</strong></li>
+    <li>Raise the tool to a safe height</li>
+    <li>Complete the operation</li>
+  </ol>
+
+  <p>
+    This ensures every tool in your project references the same Z origin established during your initial Quickset XYZ procedure.
+  </p>
+
+  <!-- ------------------------------ -->
+  <!-- SECTION 5: After Completion    -->
+  <!-- ------------------------------ -->
+
+  <h2>5. After the Z Zero Operation Completes</h2>
+
+  <ul>
+    <li>Remove the Quickset block</li>
+    <li>Load the correct toolpath for the new tool</li>
+    <li>Press <strong>Start</strong> to continue the project</li>
+  </ul>
+
+  <!-- ------------------------------ -->
+  <!-- SECTION 6: Safety Notes        -->
+  <!-- ------------------------------ -->
+
+  <h2>6. Safety Notes</h2>
+
+  <ul>
+    <li>Always ensure clamps and fixtures are clear of the probing path</li>
+    <li>Never press OK unless the Quickset block is positioned correctly</li>
+    <li>Press <strong>ESC</strong> to abort at any time before confirmation</li>
+    <li>Verify the tool is securely tightened before running the routine</li>
+  </ul>
+
+</article>
+
+<!-- =============================================== -->
+<!-- CHAPTER: Verify Carving Area (Trace Function)  -->
+<!-- =============================================== -->
+
+<article id="chapter-verify-carving-area" class="manual-chapter">
+
+  <h1>Verify Carving Area (Trace Function)</h1>
+
+  <p>
+    The <strong>Verify Carving Area</strong> button performs a visual “trace” of the outer
+    boundary of your loaded toolpath. This lets you confirm:
+  </p>
+
+  <ul>
+    <li>That your material is oriented correctly on the table</li>
+    <li>That clamps, screws, and fixtures are clear of the carving extents</li>
+    <li>That the toolpath fits within the machine’s travel limits</li>
+  </ul>
+
+  <figure class="figure-inline">
+    <img src="assets/IMG_BTN_Trace.svg" alt="Verify Carving Area (Trace) top-toolbar button">
+    <figcaption>
+      OmniControl <strong>Verify Carving Area</strong> top-toolbar button.
+    </figcaption>
+  </figure>
+
+  <p>
+    Run this routine after your project G-code is loaded and your X, Y, and Z work offset
+    origin has been set (for example, using the DWC Quickset XYZ Origin procedure).
+  </p>
+
+  <!-- 1. Purpose -->
+
+  <h2>1. What the Verify Carving Area Routine Does</h2>
+
+  <p>
+    When executed, OmniControl raises the tool to the job’s 
+    <strong>G-code Safe Height</strong> (often labeled “Z Gap above Material”) and traces
+    the X–Y extents of the toolpath. This provides a clear preview of the carving footprint
+    before any material is cut.
+  </p>
+
+  <figure class="figure-large">
+    <img src="assets/verify_carving_area_screenshot.png" alt="Verify Carving Area popup dialog">
+    <figcaption>
+      Verify Carving Area confirmation popup that appears before beginning the trace.
+    </figcaption>
+  </figure>
+
+  <!-- 2. Requirements -->
+
+  <h2>2. Requirements Before Running</h2>
+
+  <p>Before clicking the button, make sure:</p>
+
+  <ul>
+    <li>Your project G-code file is loaded in OmniControl.</li>
+    <li>Your <strong>Work Offset Origin</strong> (X0, Y0, Z0) is correctly set.</li>
+    <li>Material is securely clamped, and fixtures are placed where you expect them.</li>
+  </ul>
+
+  <!-- 3. Starting the Trace -->
+
+  <h2>3. Starting the Verify Carving Area Routine</h2>
+
+  <ol>
+    <li>Click the <strong>Verify Carving Area</strong> button in the top toolbar.</li>
+    <li>
+      When the confirmation popup appears:
+      <ul>
+        <li>Click <strong>OK (✔)</strong> to begin the trace, or</li>
+        <li>Press <strong>ESC</strong> on the keyboard to cancel the operation.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="callout callout-tip">
+    <strong>Tip:</strong> If you accidentally open the Verify Carving Area dialog but do not
+    want to run the routine, always press <strong>ESC</strong> to exit instead of OK.
+  </div>
+
+  <!-- 4. What Happens During the Trace -->
+
+  <h2>4. What Happens During the Trace</h2>
+
+  <h3>4.1 Lift to Safe Z Height</h3>
+  <p>
+    After confirmation, OmniControl first raises the tool to the programmed 
+    <strong>G-code Safe Height</strong>. This provides vertical clearance above your material
+    surface for the entire trace motion.
+  </p>
+
+  <h3>4.2 Outline the Carving Boundary</h3>
+  <p>
+    The CNC then moves in X and Y to trace the outer extents of the loaded toolpath.
+    This motion follows the maximum X–Y coordinates of the job, giving you a preview
+    of the full carving footprint.
+  </p>
+
+  <p>
+    On machines equipped with homing and limit switches, if the toolpath would exceed
+    the machine’s travel, OmniControl will stop and report a
+    <strong>“Machine Limits Reached”</strong> error. This lets you fix the issue before
+    any cutting begins.
+  </p>
+
+  <h3>4.3 Return to Work Origin at Safe Height</h3>
+  <p>
+    When the trace completes, OmniControl returns the spindle to:
+  </p>
+
+  <ul>
+    <li><strong>X = 0</strong> (current work coordinate system X zero)</li>
+    <li><strong>Y = 0</strong> (current work coordinate system Y zero)</li>
+    <li><strong>Z = G-code Safe Height</strong> (safe travel height above material)</li>
+  </ul>
+
+  <p>
+    If the spindle does not return smoothly to this position, it may indicate lost
+    steps, mechanical binding, or a work offset mismatch that should be corrected
+    before carving.
+  </p>
+
+  <!-- 5. Safety Notes -->
+
+  <h2>5. Safety Notes</h2>
+
+  <ul>
+    <li>The spindle does <strong>not</strong> turn on during this routine.</li>
+    <li>
+      Keep hands, tools, and loose items clear of the machine while the trace runs,
+      even though the tool is above the material.
+    </li>
+    <li>
+      If anything looks wrong during the motion, press the machine’s
+      <strong>Stop</strong> or <strong>E-Stop</strong> and investigate before continuing.
+    </li>
+  </ul>
+
+</article>
+<!-- ========================= -->
+<!-- CHAPTER: LASER MODE OVERVIEW -->
+<!-- ========================= -->
+
+<article id="chapter-laser-mode" class="manual-chapter">
+
+  <h1>Laser Mode Overview</h1>
+
+  <p>
+    Laser Mode in OmniControl switches the CNC from routing or spindle carving operations 
+    to <strong>laser engraving and laser cutting</strong>. When enabled, OmniControl reroutes 
+    all spindle control commands so they safely and correctly operate your attached digital 
+    laser module instead.
+  </p>
+
+<div class="callout callout-warning laser-safety" id="laser-safety">
+  <h3>Laser Safety – Please Read Before Continuing</h3>
+  <ul>
+    <li>Always wear proper laser-rated eye protection suitable for your laser’s wavelength.</li>
+    <li>Operate the laser only in a well-ventilated area and use fume extraction whenever possible.</li>
+    <li>Keep a suitable fire extinguisher nearby. Remove flammable items (solvents, rags, sawdust piles) from the work area.</li>
+    <li>Monitor the workpiece constantly for flare-ups or sustained flame. If anything looks unsafe, press <strong>Emergency Stop</strong> immediately.</li>
+    <li><strong>Never leave the laser running unattended – not even for a short job.</strong></li>
+    <li>Only cut or engrave materials you know are safe for laser use. Some plastics and composites can release toxic fumes.</li>
+  </ul>
+</div>
+
+  <figure class="figure-large">
+    <img src="assets/enable_laser_mode.png" 
+         alt="Enable Laser Mode confirmation popup">
+    <figcaption>Laser Mode activation popup shown when enabling laser control.</figcaption>
+  </figure>
+
+  <h2>1. What Laser Mode Does</h2>
+  <p>When you click the <strong>Enable Laser Mode</strong> button, OmniControl will:</p>
+
+  <ul>
+    <li>Disable spindle output and activate laser PWM output</li>
+    <li>Switch the controller into dedicated laser-engrav­ing mode</li>
+    <li>Update the Mode tab to show <strong>Laser Mode = Active</strong></li>
+    <li>Convert spindle power commands into laser power commands</li>
+    <li>Apply laser min/max power limits and start/stop timing</li>
+  </ul>
+
+  <p>
+    This ensures all laser projects run safely, consistently, and without any risk of 
+    accidentally powering the router or spindle.
+  </p>
+
+  <h2>2. Safety Requirements Before Enabling Laser Mode</h2>
+
+  <h3>2.1 Router-equipped Units (DWC1824 &amp; DWC2440)</h3>
+  <ul>
+    <li>Ensure the <strong>router’s power switch is OFF</strong></li>
+    <li>Remove the router bit, collet, and nut for maximum clearance</li>
+    <li>Ensure your laser module is mounted securely</li>
+  </ul>
+
+  <h3>2.2 Spindle-equipped Units (DWC2636, DWC3648, DWC4848, DWC5100)</h3>
+  <ul>
+    <li>Spindle will not turn on in Laser Mode, but still remove the collet/nut</li>
+    <li>Verify the laser mount and bracket are tight</li>
+    <li>Confirm water cooling is running (if applicable)</li>
+  </ul>
+
+  <h3>2.3 General Laser Safety</h3>
+  <ul>
+    <li>Always wear proper wavelength laser safety glasses</li>
+    <li>Keep a fire extinguisher or fire blanket nearby</li>
+    <li>Never leave the CNC unattended while the laser is active</li>
+    <li>Use proper exhaust/ventilation for smoke and fumes</li>
+    <li>Avoid engraving toxic or unknown materials</li>
+  </ul>
+
+  <h2>3. Laser Mode Confirmation Popup</h2>
+  <p>
+    After clicking the Laser Mode button, OmniControl displays a confirmation popup. 
+    You must click <strong>OK (✓)</strong> to activate Laser Mode.  
+    Press <strong>ESC</strong> to cancel.
+  </p>
+
+  <figure class="figure-large">
+    <img src="assets/enable_laser_mode_state_tab.png" 
+         alt="Laser Mode enabled state indicators">
+    <figcaption>
+      Once enabled, the Mode tab updates to show Laser Mode is active.
+    </figcaption>
+  </figure>
+
+  <h2>4. What Changes After Laser Mode Is Enabled</h2>
+
+  <ul>
+    <li><strong>Laser Mode = Active</strong> indicator turns green</li>
+    <li>Spindle Mode is disabled</li>
+    <li>Laser Min/Max power limits are displayed instead of RPM settings</li>
+    <li>Start/stop timing applies to laser control</li>
+    <li>Z-axis motion is minimized (laser engraving is primarily 2D)</li>
+  </ul>
+
+  <p>
+    You must now set:
+  </p>
+
+  <ol>
+    <li><strong>Laser XY Zero</strong> (using the non-burning beam)</li>
+    <li><strong>Laser Z Focus Height</strong> (varies for 6W vs. 45W)</li>
+  </ol>
+
+  <p>These are covered in the next two chapters.</p>
+
+  <h2>5. Before Running Any Laser Job</h2>
+  <ul>
+    <li>Ensure the bit/collet has been removed</li>
+    <li>Use the proper focusing tool or gauge</li>
+    <li>Secure the material flat to the spoilboard</li>
+    <li>Use the laser’s “non-burning” low-power beam for alignment</li>
+  </ul>
+
+  <h2>6. Returning to Spindle Mode</h2>
+  <p>
+    Laser Mode remains active until you manually switch back using the 
+    <strong>Spindle / Mill Mode</strong> button.  
+    Full instructions are provided in that chapter.
+  </p>
+
+</article>
+<!-- ========================= -->
+<!-- CHAPTER: LASER XY & Z WORK OFFSET -->
+<!-- ========================= -->
+
+<article id="chapter-laser-xy-zero" class="manual-chapter">
+
+  <h1>Laser XY &amp; Z Work Offset Setup (Non-Burning Beam)</h1>
+
+  <p>
+    Before you can run any laser engraving or cutting project, you must tell OmniControl where 
+    your job starts (Laser XY Zero) and at what height the laser is in perfect focus (Laser Z Zero). 
+    Unlike spindle tools, the laser never physically touches the material. Instead, you use a very 
+    low-power <strong>non-burning beam</strong> as a pointer to aim and focus the laser safely.
+  </p>
+
+<div class="callout callout-warning laser-safety" id="laser-safety">
+  <h3>Laser Safety – Please Read Before Continuing</h3>
+  <ul>
+    <li>Always wear proper laser-rated eye protection suitable for your laser’s wavelength.</li>
+    <li>Operate the laser only in a well-ventilated area and use fume extraction whenever possible.</li>
+    <li>Keep a suitable fire extinguisher nearby. Remove flammable items (solvents, rags, sawdust piles) from the work area.</li>
+    <li>Monitor the workpiece constantly for flare-ups or sustained flame. If anything looks unsafe, press <strong>Emergency Stop</strong> immediately.</li>
+    <li><strong>Never leave the laser running unattended – not even for a short job.</strong></li>
+    <li>Only cut or engrave materials you know are safe for laser use. Some plastics and composites can release toxic fumes.</li>
+  </ul>
+</div>
+
+  <p>
+    This chapter explains how to:
+  </p>
+  <ol>
+    <li>Turn on the laser’s non-burning beam using the MDI bar and the M3/M5 button</li>
+    <li>Set Laser XY Zero at your chosen datum point</li>
+    <li>Set Laser Z Zero at the correct focus height</li>
+    <li>Verify everything before running a job</li>
+  </ol>
+
+  <h2>1. What Is the Non-Burning Beam?</h2>
+
+  <p>
+    The non-burning beam is the laser running at an extremely low power level. At this power:
+  </p>
+  <ul>
+    <li>The beam is visible on the material</li>
+    <li>It <strong>does not burn</strong> or mark the surface when used correctly</li>
+    <li>You can safely jog the machine to position and focus the laser</li>
+  </ul>
+
+  <p>
+    On Digital Wood Carver machines, the non-burning beam is enabled manually using the 
+    <strong>MDI input bar</strong> and the <strong>M3/M5 Spindle–Laser On/Off</strong> button. 
+    This is used only for setup and alignment. It should <strong>not</strong> be written into your 
+    project’s G-code file.
+  </p>
+
+  <h2>2. Before You Begin</h2>
+
+  <h3>2.1 Confirm Laser Mode Is Active</h3>
+  <p>
+    Make sure the machine is in <strong>Laser Mode</strong> (see the previous chapter). On the 
+    <em>Mode</em> tab you should see:
+  </p>
+  <ul>
+    <li><strong>Laser Mode</strong> &mdash; active (green)</li>
+    <li><strong>Spindle Mode</strong> &mdash; off</li>
+  </ul>
+
+  <h3>2.2 Remove Router/Spindle Tooling</h3>
+  <ul>
+    <li>Remove any router bit or endmill</li>
+    <li>Remove the collet nut and collet, or install a blank collet with no tool</li>
+    <li>Verify there is plenty of clearance between the router/spindle body and the material</li>
+  </ul>
+
+  <h3>2.3 Secure the Material</h3>
+  <ul>
+    <li>Clamp the workpiece flat against the spoilboard</li>
+    <li>Keep clamps and fixtures <strong>outside</strong> the planned laser area</li>
+    <li>Avoid warped or loose stock &mdash; focus distance must stay consistent</li>
+  </ul>
+
+  <h2>3. Turning On the Non-Burning Beam (MDI + M3/M5)</h2>
+
+  <p>
+    To enable the low-power alignment beam, you will use the 
+    <strong>Manual Data Input (MDI)</strong> bar and the 
+    <strong>M3/M5 Spindle–Laser On/Off</strong> button in the PlanetCNC top toolbar.
+  </p>
+
+  <figure class="figure-inline">
+    <img src="assets/M3-M5_Spindle_Laser_On-Off_button.png"
+         alt="PlanetCNC M3/M5 Spindle-Laser On/Off button icon">
+    <figcaption>M3/M5 Spindle–Laser On/Off button used to toggle the laser beam.</figcaption>
+  </figure>
+
+  <h3>3.1 Enter S1 in the MDI Bar</h3>
+
+  <ol>
+    <li>Click inside the <strong>MDI input bar</strong> at the bottom of the OmniControl window.</li>
+    <li>Type <code>S1</code> (letter S followed by the number 1).</li>
+    <li>Press <strong>Enter</strong> on the keyboard to send the command.</li>
+  </ol>
+
+  <figure class="figure-large">
+    <img src="assets/mdi_manual_data_input_bar_s1.png"
+         alt="MDI bar with S1 typed in">
+    <figcaption>MDI bar with <code>S1</code> typed in to set low laser power.</figcaption>
+  </figure>
+
+  <p>
+    This sets the controller’s current spindle/laser power value to its lowest usable level.
+  </p>
+
+  <h3>3.2 Toggle the Laser On with M3/M5</h3>
+
+  <ol>
+    <li>Click the <strong>M3/M5 Spindle–Laser On/Off</strong> button in the top toolbar.</li>
+    <li>The laser turns on at the low power level set by <code>S1</code>.</li>
+  </ol>
+
+  <p>
+    You should now see a faint, non-burning dot on the material. If the beam is not visible,
+    carefully adjust your room lighting and verify you are in Laser Mode.
+  </p>
+
+  <p>
+    When you are finished aligning the laser, simply click the 
+    <strong>M3/M5</strong> button again to turn the beam <strong>off</strong>.
+  </p>
+
+  <div class="callout callout-tip">
+    <strong>Important:</strong> The <code>S1</code> and M3/M5 commands used here are 
+    intended <em>only for manual alignment</em>. Do not add this non-burning beam setting 
+    to your project’s G-code file.
+  </div>
+
+  <h2>4. Setting Laser XY Work Offset Zero</h2>
+
+  <p>
+    Once the non-burning beam is on, you can set your Laser XY Zero. Most laser jobs use either:
+  </p>
+  <ul>
+    <li>The <strong>front-left corner</strong> of the design as XY zero, or</li>
+    <li>The <strong>center</strong> of the design as XY zero</li>
+  </ul>
+
+  <h3>4.1 Jog to the X/Y Datum Point</h3>
+
+  <ol>
+    <li>Use the OmniControl jog controls to move the laser over your chosen datum point.</li>
+    <li>Jog slowly as you get close, using small step moves for accuracy.</li>
+    <li>Align the low-power dot precisely on the corner or center mark of your project.</li>
+  </ol>
+
+  <h3>4.2 Set X = 0 and Y = 0</h3>
+
+  <ol>
+    <li>With the beam aimed at the exact datum point, press <strong>X = 0</strong> in OmniControl.</li>
+    <li>Press <strong>Y = 0</strong> in OmniControl.</li>
+  </ol>
+
+  <p>
+    This sets the current position as the <strong>Laser XY Zero</strong> for the active work 
+    coordinate system (for example G54, G55, etc.). Your job will now start from this point 
+    when you run the laser G-code.
+  </p>
+
+  <h2>5. Setting the Laser Z Focus Height (Z Zero)</h2>
+
+  <p>
+    Z Zero for laser work is defined as the height where the laser is in 
+    <strong>perfect focus</strong>, not where a tool touches the material.
+  </p>
+
+  <p>
+    The focusing method depends on your laser model:
+  </p>
+  <ul>
+    <li><strong>DWC 6-Watt Laser</strong> &mdash; uses a manual focus ring and visual sharpness of the spot.</li>
+    <li><strong>DWC 45-Watt Laser</strong> &mdash; uses a dedicated focusing gauge or spacer.</li>
+  </ul>
+
+  <p>
+    This chapter gives the basic Z-zero concept. The next two chapters provide detailed 
+    procedures for each laser type.
+  </p>
+
+  <h3>5.1 Move to Focus Height</h3>
+
+  <ol>
+    <li>With the non-burning beam still on, jog the Z axis down toward the material.</li>
+    <li>
+      For the <strong>6-Watt Laser</strong>, adjust the focus ring and Z height until the dot is 
+      as small and sharp as possible.
+    </li>
+    <li>
+      For the <strong>45-Watt Laser</strong>, place the manufacturer’s focus gauge between the 
+      nozzle and the workpiece, jog Z until the gauge just touches, then remove the gauge.
+    </li>
+  </ol>
+
+  <h3>5.2 Set Z = 0</h3>
+
+  <p>
+    Once you are confident the laser is at the correct focus height:
+  </p>
+
+  <ol>
+    <li>Press <strong>Z = 0</strong> in OmniControl.</li>
+  </ol>
+
+  <p>
+    This tells OmniControl that the current Z height is the correct 
+    <strong>Laser Z Zero (focus height)</strong> for the job.
+  </p>
+
+  <h2>6. Verification Checklist Before Running a Job</h2>
+
+  <p>Before starting your laser G-code, verify the following:</p>
+
+  <ul>
+    <li>Laser Mode is active on the <em>Mode</em> tab</li>
+    <li>MDI commands are complete and the non-burning beam has been turned off (M3/M5)</li>
+    <li>DRO shows <strong>X = 0</strong> and <strong>Y = 0</strong> at your chosen datum</li>
+    <li>DRO shows <strong>Z = 0</strong> at the correct focus height</li>
+    <li>Material is secure and clamps are clear of the laser path</li>
+    <li>Proper laser safety glasses are on and ventilation is running</li>
+  </ul>
+
+  <h2>7. What Comes Next</h2>
+
+  <p>
+    With Laser XY and Z Zero set, you are ready to dial in precise focus for your specific 
+    laser module:
+  </p>
+
+  <ul>
+    <li><strong>Next Chapter:</strong> <em>How to Focus Your DWC 6-Watt Laser</em></li>
+    <li><strong>Then:</strong> <em>How to Focus Your DWC 45-Watt Laser</em></li>
+  </ul>
+
+</article>
+<!-- ========================= -->
+<!-- CHAPTER: 6-WATT LASER FOCUS (XT-50) -->
+<!-- ========================= -->
+
+<article id="chapter-laser-focus-6w" class="manual-chapter">
+
+  <h1>How to Focus Your DWC 6-Watt Laser (PLH3D-XT-50)</h1>
+
+  <p>
+    Correct focus is the most important step for achieving clean, sharp engravings and
+    optimal cutting performance with your DWC 6-watt laser module. This chapter walks you
+    through a quick everyday focusing method plus an optional advanced calibration sweep
+    for users who want maximum precision.
+  </p>
+
+<div class="callout callout-warning laser-safety" id="laser-safety">
+  <h3>Laser Safety – Please Read Before Continuing</h3>
+  <ul>
+    <li>Always wear proper laser-rated eye protection suitable for your laser’s wavelength.</li>
+    <li>Operate the laser only in a well-ventilated area and use fume extraction whenever possible.</li>
+    <li>Keep a suitable fire extinguisher nearby. Remove flammable items (solvents, rags, sawdust piles) from the work area.</li>
+    <li>Monitor the workpiece constantly for flare-ups or sustained flame. If anything looks unsafe, press <strong>Emergency Stop</strong> immediately.</li>
+    <li><strong>Never leave the laser running unattended – not even for a short job.</strong></li>
+    <li>Only cut or engrave materials you know are safe for laser use. Some plastics and composites can release toxic fumes.</li>
+  </ul>
+</div>
+
+  <p>
+    The information in this chapter is based on the optical specifications provided in the
+    PLH3D-XT-50 laser head manual, with all metric values also shown in inches for
+    convenience.
+  </p>
+  
+   <figure class="figure-large">
+    <img src="assets/laser_focal_distance_xt-50.png"
+         alt="PLH3D-XT-50-6W laser head working distance diagram showing 60.0 mm from bottom face to material and 2 mm from nozzle tip to material">
+    <figcaption>
+      Legacy PLH3D-XT-50-6W laser head working distance. The critical dimension is the
+      <strong>60.0&nbsp;mm (2.36&nbsp;in)</strong> from the
+      <strong>bottom face of the laser head</strong> to the material surface. The nozzle-to-material gap is about 2&nbsp;mm (0.08&nbsp;in) at this height.
+          </figcaption>
+  </figure>
+
+  <h2>1. Working Distance (Focal Distance) Basics</h2>
+
+  <p>
+    Your 6-watt laser module is factory-designed to produce its tightest beam at a specific
+    distance from the laser head to the workpiece. This is called the
+    <strong>working distance</strong> (WD).
+  </p>
+
+  <p>
+    For the PLH3D-XT-50 used on Digital Wood Carver machines, the recommended working
+    distance is:
+  </p>
+
+  <ul>
+    <li><strong>60&nbsp;mm (2.36&nbsp;inches)</strong> between the
+        <strong>bottom face of the laser head</strong> and the top surface of the material.</li>
+  </ul>
+
+  <p>
+    When the Z-axis is set so that the <strong>flat underside of the laser body</strong>
+    (bottom face of the laser head) is approximately 60&nbsp;mm (2.36&nbsp;in) above the
+    material, the beam is at its smallest diameter. This produces:
+  </p>
+
+  <ul>
+    <li>Thinner engraving lines</li>
+    <li>Cleaner edges with less charring</li>
+    <li>Greater effective cutting depth</li>
+    <li>Higher detail in raster engravings</li>
+  </ul>
+
+  <p>
+    Even small deviations from this distance can reduce beam quality. A difference of
+    about <strong>1&nbsp;mm (0.04&nbsp;in)</strong> is usually enough to make the line
+    visibly wider and softer.
+  </p>
+
+  <div class="callout callout-tip">
+    <strong>Important:</strong> Always measure working distance from the
+    <em>bottom face of the laser head</em>, not from any nozzle lip or aperture.
+  </div>
+
+  <h2>2. Safety Before Focusing</h2>
+
+  <h3>2.1 Protective Equipment</h3>
+  <ul>
+    <li>Wear proper laser safety glasses rated for your laser’s wavelength.</li>
+    <li>Ensure good ventilation or fume extraction.</li>
+    <li>Remove shiny or highly reflective objects from the work area.</li>
+  </ul>
+
+  <h3>2.2 Machine &amp; Workpiece Preparation</h3>
+  <ul>
+    <li>OmniControl must be in <strong>Laser Mode</strong> (see the Laser Mode chapter).</li>
+    <li>The router/spindle power must be <strong>off</strong>.</li>
+    <li>No router bit or cutting tool should be installed in the collet.</li>
+    <li>Secure the workpiece flat to the spoilboard and keep clamps clear of the beam path.</li>
+  </ul>
+
+  <h3>2.3 Use a Non-Burning Alignment Beam</h3>
+
+  <p>
+    For focusing and positioning, you should use a very low-power, “non-burning” beam.
+    This lets you see where the laser is pointed without marking the material.
+  </p>
+
+  <p>To enable the non-burning beam:</p>
+
+  <ol>
+    <li>Click inside the <strong>MDI</strong> input bar at the bottom of OmniControl.</li>
+    <li>Type <code>S1</code> and press <strong>Enter</strong> to set a very low power value.</li>
+    <li>Click the <strong>M3/M5 Spindle–Laser On/Off</strong> button in the top toolbar to turn the beam on.</li>
+  </ol>
+
+  <p>
+    You should now see a faint dot on the material. When you are done aligning or focusing,
+    click the same M3/M5 button again to turn the beam off.
+  </p>
+
+  <div class="callout">
+    <strong>Note:</strong> The <code>S1</code> and M3/M5 commands are used here only for
+    manual alignment and focusing. Do not bake this “non-burning” beam setting into your
+    project’s G-code files.
+  </div>
+
+  <h2>3. Quick Focus Method (Recommended)</h2>
+
+  <p>
+    This method is fast and accurate enough for most engraving and light cutting projects.
+  </p>
+
+  <h3>3.1 Move to Your Laser XY Zero</h3>
+
+  <ol>
+    <li>Enable the non-burning alignment beam as described above.</li>
+    <li>Jog the machine so the beam is directly over your chosen
+        <strong>Laser XY Work Zero</strong> point (corner or center of your job).</li>
+    <li>Use smaller jog steps as you get close so you can aim the dot precisely.</li>
+  </ol>
+
+  <h3>3.2 Adjust Z to the Working Distance</h3>
+
+  <ol>
+    <li>Jog the Z-axis up or down slowly.</li>
+    <li>
+      Stop when the distance from the <strong>bottom face of the laser head</strong> to the
+      material is as close as possible to
+      <strong>60&nbsp;mm (2.36&nbsp;inches)</strong>.
+    </li>
+    <li>Visually confirm that the laser dot is as small and sharp as you can make it.</li>
+  </ol>
+
+  <p>
+    On many jobs, simply bringing the head to this known working distance is all that is
+    required for a very good focus.
+  </p>
+
+  <h3>3.3 Set Laser Z Work Offset</h3>
+
+  <p>
+    Once the height looks correct:
+  </p>
+
+  <ol>
+    <li>With the head at the proper working distance, press <strong>Z = 0</strong> in OmniControl
+        (or use your normal “Set Z Zero” workflow for laser jobs).</li>
+  </ol>
+
+  <p>
+    OmniControl now treats this height as your <strong>Laser Z Zero</strong> (focus height)
+    for the active work coordinate system.
+  </p>
+
+  <h3>3.4 Turn the Beam Off</h3>
+
+  <p>
+    When you are finished focusing:
+  </p>
+
+  <ol>
+    <li>Click the <strong>M3/M5 Spindle–Laser On/Off</strong> button to switch the beam off.</li>
+  </ol>
+
+  <h2>4. Advanced Precision Calibration (Optional)</h2>
+
+  <p>
+    If you need the thinnest possible lines or the cleanest cuts (for example, tiny text or
+    high-detail engraving), you can fine-tune focus around the 60&nbsp;mm working distance.
+    This is a two-stage calibration process:
+  </p>
+
+  <ol>
+    <li>Coarse sweep around 60&nbsp;mm (2.36&nbsp;in).</li>
+    <li>Fine sweep around the best result from the coarse sweep.</li>
+  </ol>
+
+  <h3>4.1 Suggested Test Materials</h3>
+
+  <p>For best visibility when comparing line quality, use:</p>
+
+  <ul>
+    <li><strong>Black anodized aluminum</strong> (excellent test surface)</li>
+    <li><strong>Black-painted glass or microscope slide</strong> (very high contrast)</li>
+    <li>Thin plywood or other flat, consistent material (acceptable)</li>
+  </ul>
+
+  <p>
+    On anodized aluminum, slightly tilting the material (about 4–7°) can make differences
+    in line thickness easier to see.
+  </p>
+
+  <h3>4.2 Calibration Run #1 – Coarse Sweep</h3>
+
+  <p>Goal: Find the approximate best focus around the nominal WD.</p>
+
+  <ol>
+    <li>Set the Z height so the bottom face of the laser head is at
+        <strong>60&nbsp;mm (2.36&nbsp;in)</strong> above the material.</li>
+    <li>
+      Prepare a simple G-code that engraves a series of horizontal lines, each at a different
+      Z height.
+    </li>
+    <li>
+      For each line, change the Z height in steps of
+      <strong>1&nbsp;mm (0.04&nbsp;in)</strong>, sweeping about
+      <strong>±5&nbsp;mm (±0.20&nbsp;in)</strong> around the nominal WD.
+      This will cover roughly 55–65&nbsp;mm (2.16–2.56&nbsp;in).
+    </li>
+    <li>Label each line with the Z height used.</li>
+    <li>Select the line that is <strong>thinnest, sharpest, and highest contrast</strong>.</li>
+  </ol>
+
+  <p>
+    The Z height that produced the best line is your “coarse” best working distance.
+  </p>
+
+  <h3>4.3 Calibration Run #2 – Fine Sweep</h3>
+
+  <p>Goal: Refine the best focus to a very small range.</p>
+
+  <ol>
+    <li>Use the best height found in Run #1 as your center value.</li>
+    <li>
+      Create a second set of lines, adjusting Z in steps of
+      <strong>0.1&nbsp;mm (0.004&nbsp;in)</strong> above and below that center value.
+    </li>
+    <li>Engrave and label each line with its exact Z height.</li>
+    <li>
+      Carefully inspect the lines under good lighting. Choose the one that is
+      <strong>clearly the narrowest and most consistent</strong>.
+    </li>
+  </ol>
+
+  <p>
+    The Z height for that line is your <strong>precise optimal working distance</strong> for
+    this laser and test material.
+  </p>
+
+  <h2>5. Saving and Reusing Your Focus Height</h2>
+
+  <ol>
+    <li>Jog the head so the bottom face of the laser is again at your optimal height above the material.</li>
+    <li>At this position, press <strong>Z = 0</strong> (or run <code>G92 Z0</code> in the MDI bar).</li>
+  </ol>
+
+  <p>
+    Write this height down and keep it with your machine notes. As long as you set the head
+    to this working distance above the material, you will be at or very close to perfect focus.
+  </p>
+
+  <h2>6. Adjusting for Different Material Thicknesses</h2>
+
+  <p>
+    When you change to a thicker or thinner workpiece, your goal is to keep the
+    <strong>distance from the bottom face of the laser head to the material</strong>
+    the same as your calibrated working distance.
+  </p>
+
+  <ul>
+    <li>Place the new material on the table and secure it.</li>
+    <li>Jog Z until the head is at your known working distance above the new surface.</li>
+    <li>Set <strong>Z = 0</strong> again for this job.</li>
+  </ul>
+
+  <p>
+    You only need to repeat the full two-stage calibration when you make major changes,
+    such as a different laser head, a major hardware change, or if you are chasing
+    maximum detail on new materials.
+  </p>
+
+  <h2>7. Air Assist (Recommended)</h2>
+
+  <p>
+    If your 6-watt laser is used with an air assist nozzle, a gentle, directed airflow can:
+  </p>
+
+  <ul>
+    <li>Reduce soot and char around engraving lines</li>
+    <li>Improve cutting depth and edge quality</li>
+    <li>Help keep the lens cleaner for longer periods</li>
+  </ul>
+
+  <p>
+    Use moderate air pressure aimed at the cutting point. Excessive pressure is usually not
+    needed and may blow debris into unwanted areas.
+  </p>
+
+  <h2>8. Next Steps</h2>
+
+  <p>
+    With your 6-watt laser correctly focused, you are ready to:
+  </p>
+
+  <ul>
+    <li>Set up and run engraving and cutting projects in Laser Mode.</li>
+    <li>Use the Laser XY &amp; Z Work Offset tools covered in the previous chapter.</li>
+    <li>Move on to the next chapter:
+        <em>How to Focus Your DWC 45-Watt Laser</em> for users with the higher power module.</li>
+  </ul>
+
+</article>
+<!-- ========================= -->
+<!-- CHAPTER: LEGACY 6W LASER FOCUS (PLH3D-6W) -->
+<!-- ========================= -->
+
+<article id="chapter-laser-focus-legacy-6w" class="manual-chapter">
+
+  <h1>Focusing the Legacy 6-Watt Laser (PLH3D-6W Series)</h1>
+
+  <p>
+    Some Digital Wood Carver machines are equipped with an older Opt Lasers
+    <strong>PLH3D-6W</strong> module instead of the newer XT-50 head. The focusing
+    principles are similar, but the factory working distance and recommended tuning
+    procedure come from a different manual. This chapter explains how to quickly set
+    focus for everyday jobs and how to perform a more advanced calibration sweep when
+    you need maximum sharpness.
+  </p>
+
+<div class="callout callout-warning laser-safety" id="laser-safety">
+  <h3>Laser Safety – Please Read Before Continuing</h3>
+  <ul>
+    <li>Always wear proper laser-rated eye protection suitable for your laser’s wavelength.</li>
+    <li>Operate the laser only in a well-ventilated area and use fume extraction whenever possible.</li>
+    <li>Keep a suitable fire extinguisher nearby. Remove flammable items (solvents, rags, sawdust piles) from the work area.</li>
+    <li>Monitor the workpiece constantly for flare-ups or sustained flame. If anything looks unsafe, press <strong>Emergency Stop</strong> immediately.</li>
+    <li><strong>Never leave the laser running unattended – not even for a short job.</strong></li>
+    <li>Only cut or engrave materials you know are safe for laser use. Some plastics and composites can release toxic fumes.</li>
+  </ul>
+</div>
+
+  <p>
+    All distances are given in both metric and imperial units so you can use whichever
+    system you prefer at the machine.
+  </p>
+
+  <h2>1. Working Distance for the PLH3D-6W</h2>
+
+  <p>
+    The <strong>working distance (WD)</strong> is the ideal distance between the laser
+    module and the top of your material where the beam is at its smallest and most
+    powerful.
+  </p>
+
+  <p>
+    For the legacy <strong>PLH3D-6W</strong> head used on Digital Wood Carver machines:
+  </p>
+
+  <ul>
+    <li>
+      Factory working distance:
+      <strong>60.4&nbsp;mm</strong> &nbsp;=&nbsp; <strong>2.38&nbsp;inches</strong>
+      (approximately) from the <strong>bottom face of the laser head</strong> to the top
+      surface of the material.
+    </li>
+    <li>
+      With the factory air-assist nozzle installed, this typically leaves about
+      <strong>2&nbsp;mm (0.08&nbsp;in)</strong> between the nozzle tip and the material
+      when the head is at the correct working distance.
+    </li>
+  </ul>
+
+  <figure class="figure-large">
+    <img src="assets/laser_focal_distance_PLH3D-6W.png"
+         alt="PLH3D-6W laser head working distance diagram showing 60.4 mm from bottom face to material and 2 mm from nozzle tip to material">
+    <figcaption>
+      Legacy PLH3D-6W laser head working distance. The critical dimension is the
+      <strong>60.0&nbsp;mm (2.36&nbsp;in)</strong> from the
+      <strong>bottom face of the laser head</strong> to the material surface.
+          </figcaption>
+  </figure>
+
+  <div class="callout callout-tip">
+    <strong>Important:</strong> Always measure working distance from the
+    <em>bottom face of the laser head</em> (flat underside of the body), not from the
+    front of the nozzle or the lens opening.
+  </div>
+
+  <h2>2. Safety Before Focusing</h2>
+
+  <h3>2.1 Protective Gear</h3>
+  <ul>
+    <li>Wear laser safety glasses rated for the wavelength of your 6-watt laser.</li>
+    <li>Provide adequate ventilation or fume extraction.</li>
+    <li>Keep reflective objects out of the beam path.</li>
+  </ul>
+
+  <h3>2.2 Machine &amp; Workpiece Setup</h3>
+  <ul>
+    <li>OmniControl must be in <strong>Laser Mode</strong>.</li>
+    <li>The router or spindle power switch must be <strong>off</strong>.</li>
+    <li>No router bit should be installed; remove the collet if possible for extra clearance.</li>
+    <li>Secure your workpiece flat to the spoilboard; keep clamps outside the planned laser area.</li>
+  </ul>
+
+  <h3>2.3 Use a Non-Burning Alignment Beam</h3>
+
+  <p>
+    For focusing and XY positioning, use a very low-power, “non-burning” beam so you can
+    see the dot without marking the material.
+  </p>
+
+  <ol>
+    <li>Click in the <strong>MDI</strong> bar at the bottom of OmniControl.</li>
+    <li>Type <code>S1</code> and press <strong>Enter</strong> to set a very low power value.</li>
+    <li>Click the <strong>M3/M5 Spindle–Laser On/Off</strong> button in the top toolbar to turn the beam on.</li>
+  </ol>
+
+  <p>
+    When you are done focusing or positioning, click the same <strong>M3/M5</strong> button
+    again to turn the beam off.
+  </p>
+
+  <div class="callout">
+    <strong>Note:</strong> The <code>S1</code> power level and manual M3/M5 command are
+    for alignment and focusing only. Do not include this “non-burning” setting in your
+    project G-code.
+  </div>
+
+  <h2>3. Quick Focus Method (Recommended)</h2>
+
+  <p>
+    Use this method for everyday engraving and cutting. It is simple, fast, and accurate
+    enough for most woodworking and sign projects.
+  </p>
+
+  <h3>3.1 Move to Your Laser XY Zero</h3>
+
+  <ol>
+    <li>Enable the non-burning beam as described above.</li>
+    <li>Jog the machine so the beam is directly over your chosen
+        <strong>Laser XY Work Zero</strong> point (corner or center of the job).</li>
+    <li>Use smaller jog steps as you get close so you can aim the dot precisely.</li>
+  </ol>
+
+  <h3>3.2 Set Z to the Working Distance</h3>
+
+  <ol>
+    <li>
+      Jog the Z-axis until the distance from the
+      <strong>bottom face of the laser head</strong> to the material is as close as
+      possible to <strong>60.4&nbsp;mm (2.38&nbsp;inches)</strong>.
+    </li>
+    <li>
+      If you have a gauge block, spacer, or focusing jig for this head, place it on the
+      material and lower the laser until the bottom face just touches the gauge, then
+      remove the gauge.
+    </li>
+    <li>
+      Visually confirm that the laser dot appears small and sharp at this height when the
+      beam is on at low power.
+    </li>
+  </ol>
+
+  <h3>3.3 Set Laser Z Work Offset</h3>
+
+  <ol>
+    <li>With the head at the correct distance, set <strong>Z = 0</strong> in OmniControl
+        (or use your standard “Set Z Zero” process for laser jobs).</li>
+  </ol>
+
+  <p>
+    OmniControl now treats this height as the <strong>Laser Z Zero</strong> (focus height)
+    for your current work coordinate system.
+  </p>
+
+  <h3>3.4 Turn the Beam Off</h3>
+
+  <ol>
+    <li>Click the <strong>M3/M5 Spindle–Laser On/Off</strong> button to switch the beam off.</li>
+  </ol>
+
+  <p>
+    You are now ready to run a test pattern or your actual job with the legacy 6-watt laser
+    at its factory working distance.
+  </p>
+
+  <h2>4. Advanced Precision Focus (Coarse + Fine Sweep)</h2>
+
+  <p>
+    If you need the thinnest possible lines and maximum detail, you can refine the focus
+    around the factory working distance using a two-stage test pattern:
+    a <strong>coarse sweep</strong> in 1&nbsp;mm (0.039&nbsp;in) steps followed by a
+    <strong>fine sweep</strong> in 0.1&nbsp;mm (0.004&nbsp;in) steps.
+  </p>
+
+  <h3>4.1 Recommended Test Materials</h3>
+
+  <ul>
+    <li><strong>Black anodized aluminum</strong> (best contrast, very crisp lines)</li>
+    <li><strong>Black-painted glass or microscope slides</strong> (excellent visibility)</li>
+    <li>Flat, consistent wood or plywood (acceptable if the others are not available)</li>
+  </ul>
+
+  <p>
+    On anodized aluminum, tilting the material slightly (about 4–7°) can make differences
+    in line thickness easier to see.
+  </p>
+
+  <h3>4.2 Coarse Focus Sweep (1&nbsp;mm / 0.039&nbsp;in Steps)</h3>
+
+  <p>Goal: Find the approximate best focus around the nominal 60.4&nbsp;mm distance.</p>
+
+  <ol>
+    <li>
+      Set Z-zero so that the bottom face of the laser head is at approximately
+      <strong>60.4&nbsp;mm (2.38&nbsp;in)</strong> above the test material.
+    </li>
+    <li>
+      Create or load a simple G-code file that engraves a series of straight horizontal
+      lines. Each line will be burned at a different Z height.
+    </li>
+    <li>
+      For the first line, use your current Z-zero height as the reference.
+      Make this line longer than the others so you can easily recognize it.
+    </li>
+    <li>
+      For the next set of lines, offset the Z height in <strong>+1&nbsp;mm</strong>
+      (<strong>+0.039&nbsp;in</strong>) increments and offset each line in X by about
+      <strong>3&nbsp;mm (0.12&nbsp;in)</strong> so they do not overlap.
+    </li>
+    <li>
+      Repeat for negative offsets (–1&nbsp;mm steps) so your test covers roughly
+      <strong>±5&nbsp;mm (±0.20&nbsp;in)</strong> around the starting point.
+      This lets you explore a working distance range of about
+      55–65&nbsp;mm (2.16–2.56&nbsp;in).
+    </li>
+    <li>
+      After engraving, inspect the lines carefully under good lighting and, if possible,
+      with magnification.
+    </li>
+    <li>
+      Identify the line that is <strong>thinnest, sharpest, and most consistent</strong>.
+      Note the Z offset used for that line.
+    </li>
+  </ol>
+
+  <p>
+    Example: If the best line was produced at <strong>+2&nbsp;mm</strong>, then the laser
+    is focusing best 2&nbsp;mm (0.08&nbsp;in) above your original zero. If it was at
+    <strong>–3&nbsp;mm</strong>, the best focus is 3&nbsp;mm (0.12&nbsp;in) below it.
+  </p>
+
+  <h3>4.3 Apply the Coarse Correction</h3>
+
+  <ol>
+    <li>
+      Adjust your Z-zero by the measured correction amount so that Z&nbsp;=&nbsp;0 now
+      corresponds to the height that produced the best coarse line.
+    </li>
+  </ol>
+
+  <p>
+    This new Z-zero is your <strong>coarse best focus</strong> height.
+  </p>
+
+  <h3>4.4 Fine Focus Sweep (0.1&nbsp;mm / 0.004&nbsp;in Steps)</h3>
+
+  <p>Goal: Refine focus around the coarse best height with higher precision.</p>
+
+  <ol>
+    <li>
+      Using the updated Z-zero from the coarse sweep, create a second test pattern of
+      lines similar to the first one.
+    </li>
+    <li>
+      This time, vary the Z height in <strong>0.1&nbsp;mm</strong>
+      (<strong>0.004&nbsp;in</strong>) steps above and below zero. Offset each line in X
+      by about 3&nbsp;mm (0.12&nbsp;in) again.
+    </li>
+    <li>
+      Engrave the lines using the same material and similar power/speed settings as before.
+    </li>
+    <li>
+      Examine the lines and choose the one that is <strong>clearly the narrowest and most
+      uniform</strong>.
+    </li>
+    <li>
+      Record the Z offset for that line and update Z-zero by that amount so that
+      Z&nbsp;=&nbsp;0 now matches this <strong>fine best focus</strong> height.
+    </li>
+  </ol>
+
+  <p>
+    The Z-zero you end up with after the fine sweep is your <strong>precisely calibrated
+    working distance</strong> for the PLH3D-6W on that machine.
+  </p>
+
+  <h2>5. Saving and Reusing Your Focus Height</h2>
+
+  <ol>
+    <li>
+      Once you are satisfied with the focus, jog Z so the laser head is again at this
+      calibrated height above a flat reference surface.
+    </li>
+    <li>Set <strong>Z = 0</strong> in OmniControl (or run <code>G92 Z0</code> in the MDI bar).</li>
+    <li>Write down this focus height in your machine notes as
+        <strong>“Legacy 6-Watt Focus Height”</strong>.</li>
+  </ol>
+
+  <p>
+    As long as you bring the laser head to this same working distance above the material
+    before setting Z-zero for a job, you will be at or very close to optimal focus.
+  </p>
+
+  <h2>6. Adjusting for Different Material Thicknesses</h2>
+
+  <p>
+    When you change material thickness, your goal is to keep the distance from the
+    <strong>bottom face of the laser head</strong> to the material equal to your calibrated
+    working distance (factory 60.4&nbsp;mm or your refined value).
+  </p>
+
+  <ul>
+    <li>Secure the new material to the table.</li>
+    <li>Jog Z until the head is at the calibrated working distance above the new surface.</li>
+    <li>Set <strong>Z = 0</strong> again for that job.</li>
+  </ul>
+
+  <h2>7. Air Assist Considerations</h2>
+
+  <p>
+    If your PLH3D-6W is equipped with an air-assist nozzle:
+  </p>
+
+  <ul>
+    <li>
+      At the correct working distance, the nozzle tip should be approximately
+      <strong>2&nbsp;mm (0.08&nbsp;in)</strong> above the material.
+    </li>
+    <li>
+      Use moderate airflow directed at the cutting point to reduce soot and improve edge
+      quality.
+    </li>
+    <li>
+      Avoid excessive pressure that could blow debris into unwanted areas or disturb small
+      parts.
+    </li>
+  </ul>
+
+  <h2>8. When to Re-Calibrate</h2>
+
+  <p>
+    You should repeat the coarse + fine focusing procedure if:
+  </p>
+
+  <ul>
+    <li>The laser head has been removed, re-mounted, or significantly bumped.</li>
+    <li>You change to a different lens configuration or nozzle setup.</li>
+    <li>You are chasing maximum detail on a very demanding engraving job.</li>
+  </ul>
+
+  <p>
+    For normal day-to-day work, the <strong>Quick Focus Method</strong> (Section 3) is
+    usually all you need.
+  </p>
+
+</article>
+<article id="chapter-laser-focus-xt8" class="manual-chapter">
+  <header class="chapter-header">
+    <h2>Focusing the 45-Watt PLH3D-XT8 Laser</h2>
+    <p>
+      This chapter explains how to correctly focus the PLH3D-XT8 45-watt laser head on a
+      Digital Wood Carver CNC using OmniControl. A proper focus gives you clean engraving,
+      efficient cutting, and greatly reduces burn marks or flare-ups.
+    </p>
+  </header>
+
+  <!-- Standard OmniControl laser safety block -->
+  <div class="callout callout-warning laser-safety" id="laser-safety-xt8">
+    <h3>Laser Safety – Please Read Before Continuing</h3>
+    <ul>
+      <li>Always wear proper laser-rated eye protection suitable for the XT8’s wavelength.</li>
+      <li>Operate the laser only in a well-ventilated area and use fume extraction whenever possible.</li>
+      <li>Keep a suitable fire extinguisher nearby. Clear solvents, oily rags, and loose sawdust from the work area.</li>
+      <li>Watch the beam and workpiece at all times for flare-ups or sustained flame. If anything looks unsafe, press <strong>Emergency Stop</strong> immediately.</li>
+      <li><strong>Never leave the laser running unattended – not even for a short job.</strong></li>
+      <li>Only cut or engrave materials you know are safe for laser use. Some plastics and composites can release toxic fumes.</li>
+    </ul>
+  </div>
+
+  <h3>1. How the XT8 Focus System Works</h3>
+  <p>
+    The PLH3D-XT8 is a high-power, short-focus laser head. Its beam is brought to a tight
+    focus at a specific distance below the body of the laser. When the laser is at this
+    distance, the spot on the material is smallest and the power density is highest.
+  </p>
+  <p>
+    With the XT8, getting this distance correct is especially important. A small focus
+    error can mean:
+  </p>
+  <ul>
+    <li>Shallower cuts or poor engraving contrast.</li>
+    <li>More soot and charring around the design.</li>
+    <li>Needing much slower feed rates or higher power than necessary.</li>
+  </ul>
+  <p>
+    In this chapter we use a simple, repeatable method that does <strong>not</strong> require
+    the manufacturer’s height reference tool. Instead, you will rely on the laser’s
+    non-burning beam and a small gauge block or ruler to dial in focus.
+  </p>
+
+  <h3>2. XT8 Working Distance (21&nbsp;mm / 0.83&nbsp;in)</h3>
+  <p>
+    The XT8’s specified working distance is:
+  </p>
+  <ul>
+    <li><strong>21&nbsp;mm</strong> &nbsp;≈&nbsp; <strong>0.83 inches</strong></li>
+  </ul>
+  <p>
+    This is measured from the <strong>bottom face of the laser head body</strong> (not the
+    mounting bracket above) down to the <strong>top surface of the material</strong>.
+  </p>
+
+  <figure class="figure-large">
+    <img src="assets/laser_focal_distance_PLH3D-XT8.png"
+         alt="XT8 laser focal distance diagram showing 21 mm from bottom of laser body to material surface">
+    <figcaption>
+      PLH3D-XT8 recommended working distance: 21&nbsp;mm (0.83&nbsp;in) from the bottom face
+      of the laser body to the material surface.
+    </figcaption>
+  </figure>
+
+  <p>
+    You do not need to hit this distance to the exact thousandth of an inch, but you should
+    be very close. In practice you will:
+  </p>
+  <ul>
+    <li>Visually adjust Z until the beam spot on the material is at its smallest.</li>
+    <li>Confirm that the spacing from laser body to material is roughly 0.83&nbsp;in
+        (about 13/16&nbsp;in) using a gauge block, spacer, or ruler.</li>
+  </ul>
+
+  <h3>3. Preparing the Machine for Focusing</h3>
+  <p>
+    Before you turn on the laser, complete these steps:
+  </p>
+  <ol>
+    <li>
+      <strong>Install the XT8 laser head</strong> using the appropriate DWC mounting bracket and
+      ensure all fasteners are tightened.
+    </li>
+    <li>
+      <strong>Remove any router bit and collet nut</strong> from the router or spindle.
+      You want maximum clearance between the router/spindle and the material when the laser
+      is at its correct Z height.
+    </li>
+    <li>
+      <strong>Enable Laser Mode in OmniControl.</strong>
+      The <em>Mode</em> state panel should show Laser Mode as active and Spindle Mode disabled.
+    </li>
+    <li>
+      <strong>Home the machine</strong> so all machine coordinates are known and any limit
+      switches are active.
+    </li>
+    <li>
+      <strong>Place a flat test board</strong> (same material and thickness as your project)
+      on the table and secure it with clamps or fixtures that are clear of the beam path.
+    </li>
+    <li>
+      <strong>Connect and turn on air assist</strong> if available. Air assist dramatically
+      improves cutting performance and reduces charring.
+    </li>
+  </ol>
+
+  <h3>4. Turning On the Non-Burning Beam</h3>
+  <p>
+    To focus safely, you need the laser to emit a very low-power “non-burning” beam. This
+    lets you see the spot clearly without cutting or marking the material while you jog
+    the Z axis.
+  </p>
+
+  <h4>4.1 Method 1 – Using the MDI Command Bar</h4>
+  <ol>
+    <li>Make sure the machine is idle and the laser head is above the test board.</li>
+    <li>Click in the <strong>MDI (Manual Data Input)</strong> bar at the bottom of the screen.</li>
+    <li>Type <span class="kbd">M3 S1</span> and press <span class="kbd">Enter</span>.</li>
+    <li>
+      The XT8 will turn on at a very low power level. Verify that the beam is on but
+      <strong>not burning</strong> the material.
+    </li>
+  </ol>
+
+  <h4>4.2 Method 2 – S1 + Toolbar Toggle</h4>
+  <p>
+    Depending on your workflow, you can also:
+  </p>
+  <ol>
+    <li>Type <span class="kbd">S1</span> into the MDI bar and press <span class="kbd">Enter</span>.</li>
+    <li>Click the <strong>M3/M5 Spindle–Laser On/Off</strong> button on the PlanetCNC top toolbar.</li>
+    <li>
+      This combination sets the low-power value with <code>S1</code> and uses the toolbar
+      button to toggle the beam on and off.
+    </li>
+  </ol>
+
+  <div class="callout callout-tip">
+    For focusing, use the <strong>lowest power that still lets you see the spot clearly</strong>.
+    If the material begins to darken or smoke while you are focusing, reduce power or
+    increase Z height.
+  </div>
+
+  <h3>5. Focusing the XT8 – DWC Method</h3>
+  <p>
+    With the non-burning beam on and the test board in place, you can now dial in focus:
+  </p>
+
+  <ol>
+    <li>
+      <strong>Jog to a safe starting height.</strong><br>
+      Use small Z jogs to bring the laser to a point where the nozzle is comfortably above
+      the board (for example, 1–2&nbsp;inches). The spot on the material will be large and soft.
+    </li>
+    <li>
+      <strong>Slowly jog Z downward in small steps.</strong><br>
+      Move the Z axis down in small increments (for example, 0.01&nbsp;in per jog). Watch
+      the spot closely – it should become smaller and brighter as you approach the correct
+      distance.
+    </li>
+    <li>
+      <strong>Find the smallest, sharpest spot.</strong><br>
+      When you reach a point where the spot stops getting smaller and begins to grow again,
+      you have passed through the focus point. Move slightly back up until the spot is at
+      its smallest and most concentrated.
+    </li>
+    <li>
+      <strong>Fine-tune around the focus point.</strong><br>
+      Jog a few steps above and below this height and “split the difference” until you are
+      confident you have the best possible focus.
+    </li>
+    <li>
+      <strong>Verify the working distance.</strong><br>
+      With the Z axis at best focus, measure from the bottom face of the laser body down to
+      the material. It should be approximately <strong>0.83&nbsp;inches</strong> (21&nbsp;mm),
+      roughly the same as a 13/16&nbsp;in gauge block. If you are significantly off, re-check
+      your visual focus.
+    </li>
+    <li>
+      <strong>Turn the beam off.</strong><br>
+      Use <span class="kbd">M5</span> in the MDI bar or click the M3/M5 toolbar button again
+      to ensure the laser is completely off before you continue.
+    </li>
+  </ol>
+
+  <h3>6. Setting Z Zero at the Focus Height</h3>
+  <p>
+    Once you are satisfied with the focus:
+  </p>
+  <ol>
+    <li>
+      Make sure the beam is <strong>off</strong> (M5 or toolbar toggle).
+    </li>
+    <li>
+      Without moving the Z axis, set your <strong>Z Work Offset</strong> at this height.
+      Use the same Z-zero method you prefer for normal OmniControl operations (for example,
+      setting Z&nbsp;=&nbsp;0 in the active work coordinate system for engraving).
+    </li>
+    <li>
+      Record this Z focus height in your notes for that material and fixture setup. If you
+      later change material thickness or table spacing, you can return to this workflow to
+      re-establish focus.
+    </li>
+  </ol>
+
+  <h3>7. Engraving vs. Cutting – Focus Guidelines</h3>
+  <p>
+    The “perfect” focus depends on whether you are engraving the surface or trying to cut
+    through thicker material.
+  </p>
+
+  <h4>7.1 Surface Engraving</h4>
+  <ul>
+    <li>Use the <strong>sharpest possible focus at the material surface</strong>.</li>
+    <li>This produces crisp details and good contrast for logos, text, and photos.</li>
+    <li>Start with moderate power and higher speeds, then adjust based on test results.</li>
+  </ul>
+
+  <h4>7.2 Cutting Through Material</h4>
+  <ul>
+    <li>
+      For thin stock (for example, 1/8&nbsp;in), you can generally use the same focus as
+      surface engraving.
+    </li>
+    <li>
+      For thicker material (for example, 1/4&nbsp;in or more), you may get better results by
+      focusing slightly below the surface – roughly in the middle of the material’s thickness
+      – so the beam has good power density deeper into the cut.
+    </li>
+    <li>
+      Make a few test cuts with different focus depths and note which setting gives you the
+      cleanest edge with the least charring.
+    </li>
+  </ul>
+
+  <h3>8. Troubleshooting Focus Issues</h3>
+  <ul>
+    <li>
+      <strong>Wide or fuzzy beam spot</strong> – Re-focus using the visual method above and
+      verify the 0.83&nbsp;in working distance.
+    </li>
+    <li>
+      <strong>Material scorches heavily but doesn’t cut deeply</strong> – Check that focus
+      is not too far above the surface; ensure air assist is on and unobstructed.
+    </li>
+    <li>
+      <strong>Beam seems oval or streaked</strong> – Inspect the lens for dust or smoke
+      residue and clean it according to the manufacturer’s instructions.
+    </li>
+    <li>
+      <strong>Frequent flare-ups or small flames</strong> – Reduce power, increase
+      movement speed, and ensure air assist is working. Confirm the material is suitable
+      for laser cutting.
+    </li>
+    <li>
+      <strong>Focus changes during a job</strong> – Check that the laser mount and Z axis
+      are rigid and that the workpiece is firmly clamped and not warping from heat.
+    </li>
+  </ul>
+
+  <div class="callout callout-warning laser-safety">
+    <h3>Final Safety Reminder</h3>
+    <ul>
+      <li>
+        The PLH3D-XT8 is a powerful cutting laser. Treat every job as a potential fire hazard.
+      </li>
+      <li>
+        Stay at the machine, ready to hit <strong>Emergency Stop</strong> or pause if
+        anything looks wrong.
+      </li>
+      <li>
+        <strong>Never leave the laser operating unattended.</strong>
+      </li>
+    </ul>
+  </div>
+</article>
+<article id="chapter-laser-router-align" class="manual-chapter">
+  <header class="chapter-header">
+    <h2>Move Laser &amp; Spindle Position Buttons</h2>
+    <p>
+      These OmniControl buttons let you accurately swap between the router/spindle and
+      laser positions without losing your project’s work offsets. Once calibrated, you
+      can route first, then laser, or laser first, then route, and the machine will put
+      the second tool exactly where the first one was.
+    </p>
+  </header>
+
+  <figure class="figure-inline">
+    <img src="assets/IMG_BTN_Laser_To_Router.svg" alt="Move Laser to Spindle Position button">
+    <img src="assets/IMG_BTN_Router_To_Laser.svg" alt="Move Spindle to Laser Position button">
+    <figcaption>
+      OmniControl <strong>Move Laser to Spindle Position</strong> (left) and
+      <strong>Move Spindle to Laser Position</strong> (right) buttons in the top toolbar.
+    </figcaption>
+  </figure>
+
+  <h3>1. What These Buttons Do</h3>
+  <p>
+    When a digital laser is mounted on your CNC, its beam is offset from the center of
+    the router/spindle by some fixed X/Y distance. These two buttons use that offset to
+    move one tool to the other tool’s position and automatically re-zero the work
+    offsets:
+  </p>
+  <ul>
+    <li>
+      <strong>Move Laser to Spindle Position</strong> – Moves the laser to where the
+      router/spindle is currently located and sets the laser’s X/Y work offset to that
+      point.
+    </li>
+    <li>
+      <strong>Move Spindle to Laser Position</strong> – Moves the router/spindle to
+      where the laser is currently located and sets the spindle’s X/Y work offset to
+      that point.
+    </li>
+  </ul>
+  <p>
+    This is ideal for combo projects, such as carving a pocket or profile, then laser
+    engraving artwork in the exact same location.
+  </p>
+
+  <div class="callout callout-warning">
+    <strong>Important:</strong> These buttons rely on an accurate offset calibration
+    stored in two user-command script files. You must complete the calibration in this
+    chapter before using them on real projects, and you should always keep clamps and
+    fixtures clear of the travel path.
+  </div>
+
+  <h3>2. Before You Calibrate</h3>
+  <p>Make sure that:</p>
+  <ul>
+    <li>Your laser is solidly mounted and will not move on the bracket.</li>
+    <li>The router/spindle is installed and able to hold a V-bit.</li>
+    <li>
+      OmniControl is configured for your machine profile (for example,
+      <code>2440_OmniControl</code>) and can switch between Spindle Mode and Laser Mode.
+    </li>
+    <li>
+      You are comfortable jogging the machine, setting work offsets, and using the
+      <strong>Work Offset</strong> state tab.
+    </li>
+  </ul>
+
+  <div class="callout callout-tip">
+    <strong>Recommendation:</strong> Before editing scripts, make a backup copy of the
+    entire <code>UserCmd</code> folder somewhere safe.
+  </div>
+
+  <h3>3. Step 1 – Mark the Spindle Center with a V-Bit</h3>
+  <ol>
+    <li>
+      Place a flat piece of scrap material on the table and secure it with clamps
+      that are clear of your working area.
+    </li>
+    <li>
+      Install a sharp <strong>V-bit</strong> in the spindle/router. Do <strong>not</strong>
+      turn the spindle on for this procedure.
+    </li>
+    <li>
+      Jog the machine so the V-bit is roughly over the center of your scrap material.
+    </li>
+    <li>
+      Slowly jog Z down until the V-bit just dimples the material to leave a small,
+      clear mark.
+    </li>
+    <li>
+      Open the <strong>Offset</strong> state tab and <strong>zero the X and Y work
+      offsets</strong>. This locks in the dimple location as X&nbsp;=&nbsp;0,
+      Y&nbsp;=&nbsp;0 in your current work coordinate system.
+    </li>
+    <li>
+      Raise Z to a safe height and remove the V-bit from the collet.
+    </li>
+  </ol>
+
+  <h3>4. Step 2 – Move the Laser Over the Dimple and Record the Offset</h3>
+  <ol>
+    <li>
+      Enable <strong>Laser Mode</strong> in OmniControl and make sure the router bit,
+      collet, and nut are removed so they cannot hit the material.
+    </li>
+    <li>
+      Set the laser to its proper focus height above the material and then
+      <strong>zero the Z work offset</strong> for the laser.
+    </li>
+    <li>
+      Turn on the laser’s <strong>non-burning beam</strong> (for example, using
+      <span class="kbd">M3 S1</span> or <span class="kbd">S1</span> plus the M3/M5
+      toolbar button) so you can see the spot without cutting.
+    </li>
+    <li>
+      Jog X and Y until the beam is <strong>perfectly centered over the V-bit
+      dimple</strong> you made earlier.
+    </li>
+    <li>
+      On the <strong>Offset</strong> tab, <strong>record the current X and Y work
+      offset values</strong>. These numbers represent how far the laser is from the
+      spindle’s center when the spindle was at X&nbsp;=&nbsp;0, Y&nbsp;=&nbsp;0.
+    </li>
+  </ol>
+
+  <p>
+    Example (your values will be different):
+  </p>
+  <ul>
+    <li>X&nbsp;=&nbsp;<code>2.1699</code></li>
+    <li>Y&nbsp;=&nbsp;<code>-2.4501</code></li>
+  </ul>
+
+  <p>
+    Write your actual X and Y values down carefully. You will enter these into two
+    user command script files in the next step.
+  </p>
+
+  <h3>5. Step 3 – Edit the “Move Laser to Spindle Position” Script</h3>
+  <p>
+    The laser-to-spindle move is stored in a user command G-code file. The path for
+    a DWC2440 profile looks like this:
+  </p>
+  <p>
+    <code>C:\Program Files\PlanetCNC\Profiles\2440_OmniControl\UserCmd</code>
+  </p>
+  <p>
+    Your exact profile folder name may differ (for example,
+    <code>1824_OmniControl</code>, <code>4848_OmniControl</code>, etc.).
+  </p>
+
+  <ol>
+    <li>
+      Download and install <strong>Notepad++</strong> if you have not already. It is
+      highly recommended for editing OmniControl scripts.
+    </li>
+    <li>
+      Navigate to the <code>UserCmd</code> folder and open:
+      <br>
+      <code>User_Enable_Laser_to_Router_code.gcode</code> in Notepad++.
+    </li>
+    <li>
+      Locate the section that defines the laser offset variables:
+      <pre><code>(name,11 - Move Laser To Spindle Position)
+
+#&lt;laser_offset_x&gt; = -2.1699
+#&lt;laser_offset_y&gt; =  2.4501
+</code></pre>
+    </li>
+    <li>
+      Replace the example numbers with <strong>your</strong> X and Y values from
+      Step&nbsp;2, but pay attention to the signs:
+      <ul>
+        <li>
+          Use the X value with the sign needed to move the laser to the spindle
+          (often the negative of what you read when the laser was over the dimple).
+        </li>
+        <li>
+          Use the Y value with the sign needed to move the laser to the spindle.
+        </li>
+      </ul>
+      In the example above, the laser must move
+      X&nbsp;=&nbsp;<code>-2.1699</code>, Y&nbsp;=&nbsp;<code>2.4501</code> to reach
+      the spindle center.
+    </li>
+    <li>
+      Save the file. Notepad++ may prompt you to reopen in administrative mode;
+      click <strong>Yes</strong>, then save again.
+    </li>
+  </ol>
+
+  <div class="callout callout-warning">
+    <strong>Do not change</strong> the variable names or remove any other commands in
+    the script. Only update the numeric values for
+    <code>#&lt;laser_offset_x&gt;</code> and <code>#&lt;laser_offset_y&gt;</code>.
+  </div>
+
+  <h3>6. Step 4 – Edit the “Move Spindle to Laser Position” Script</h3>
+  <p>
+    Now update the reverse move, which sends the spindle to the laser position.
+  </p>
+
+  <ol>
+    <li>
+      In the same <code>UserCmd</code> folder, open:
+      <br>
+      <code>User_Enable_Router_to_Laser_code.gcode</code> in Notepad++.
+    </li>
+    <li>
+      Find the offset definitions:
+      <pre><code>(name,14 - Move Spindle To Laser Position)
+
+#&lt;laser_offset_x&gt; =  2.1699
+#&lt;laser_offset_y&gt; = -2.4501
+</code></pre>
+    </li>
+    <li>
+      Enter the <strong>same magnitudes</strong> you used in Step&nbsp;3, but with the
+      <strong>signs reversed</strong>. The negative move in “Laser to Router” becomes
+      a positive move in “Router to Laser,” and vice versa.
+      <p>
+        Using the example:
+      </p>
+      <ul>
+        <li>Laser to Spindle: X&nbsp;=&nbsp;<code>-2.1699</code>, Y&nbsp;=&nbsp;<code>2.4501</code></li>
+        <li>Spindle to Laser: X&nbsp;=&nbsp;<code>2.1699</code>, Y&nbsp;=&nbsp;<code>-2.4501</code></li>
+      </ul>
+    </li>
+    <li>
+      Save the file (again allowing Notepad++ to restart in admin mode if requested).
+    </li>
+  </ol>
+
+  <h3>7. Step 5 – Test the Buttons</h3>
+  <p>
+    Before using this in a real job, perform a dry run:
+  </p>
+
+  <ol>
+    <li>
+      Set up a scrap board and repeat the basic V-bit + laser steps, but with the
+      spindle and laser well above the surface (air moves only).
+    </li>
+    <li>
+      With the spindle active and X/Y work offsets set at the dimple position, click
+      <strong>Move Laser to Spindle Position</strong>.
+      The laser should move directly over the dimple location.
+    </li>
+    <li>
+      Switch back to Spindle Mode, and with the laser’s X/Y offset active, click
+      <strong>Move Spindle to Laser Position</strong>.
+      The spindle should return to the same point.
+    </li>
+    <li>
+      If either move is off, re-check your recorded X/Y values and the signs in both
+      script files.
+    </li>
+  </ol>
+
+  <h3>8. Typical Workflow – Carve First, Then Laser</h3>
+  <p>
+    Once calibrated, here’s how a combined carve + laser project might look:
+  </p>
+
+  <ol>
+    <li>
+      <strong>Set the project origin.</strong><br>
+      With the router/spindle installed, set your project’s X, Y, and Z work offset
+      origin for the carving portion (for example, lower-left corner of the material,
+      top surface).
+    </li>
+    <li>
+      <strong>Run the carving toolpath(s).</strong><br>
+      When complete, the router should be back at the project’s X/Y/Z zero position.
+    </li>
+    <li>
+      <strong>Prepare for laser.</strong><br>
+      Enable Laser Mode, remove the router bit, collet, and nut, set the laser’s Z
+      focus height, and zero the Z work offset for the laser.
+    </li>
+    <li>
+      <strong>Click “Move Laser to Spindle Position”.</strong><br>
+      The laser moves to the project origin and the X/Y work offsets are automatically
+      re-zeroed for the laser at that same location.
+    </li>
+    <li>
+      <strong>Load the laser G-code</strong> for the engraving portion and run the job.
+    </li>
+  </ol>
+
+  <h3>9. Reverse Workflow – Laser First, Then Carve</h3>
+  <p>
+    The process also works in reverse:
+  </p>
+  <ol>
+    <li>Set up and focus the laser, then set the X/Y/Z origin for the engraving.</li>
+    <li>Run the laser engraving portion first.</li>
+    <li>
+      Switch to Spindle Mode, install the appropriate bit, and set Z zero for carving
+      (keeping X/Y the same).
+    </li>
+    <li>
+      Click <strong>Move Spindle to Laser Position</strong> to bring the spindle
+      exactly to the laser’s origin, then run the carving toolpaths.
+    </li>
+  </ol>
+
+  <div class="callout callout-warning">
+    <strong>Safety Reminder:</strong> Always remove the router bit, collet, and nut
+    before running the laser. Make sure no clamps or fixtures are in the path of the
+    automatic moves, and be ready to use <strong>Emergency Stop</strong> if anything
+    does not look right.
+  </div>
+</article>
+<!-- =========================
+     CHAPTER: Enable Spindle Mode
+     ========================= -->
+<article id="chapter-enable-spindle-mode" class="manual-chapter">
+
+  <header class="chapter-header">
+    <h2>Enable Spindle Mode (Mill Mode)</h2>
+    <p>
+      The <strong>Enable Spindle Mode</strong> button tells OmniControl that you’re running a
+      standard routing or milling job with the physical router/spindle, not a laser.
+      When Spindle Mode is active, OmniControl arms the spindle output and treats
+      your job as a traditional carving operation.
+    </p>
+  </header>
+
+  <!-- Button preview -->
+  <figure class="figure-inline">
+    <img src="assets/IMG_BTN_Mill_Mode.svg"
+         alt="Enable Spindle Mode (Mill Mode) top-toolbar button">
+    <figcaption>
+      OmniControl <strong>Enable Spindle Mode</strong> (Mill Mode) button on the top toolbar.
+    </figcaption>
+  </figure>
+
+  <h3>1. Spindle Mode vs Laser Mode</h3>
+
+  <p>
+    OmniControl can operate in two primary modes:
+    <strong>Spindle Mode</strong> for routing/milling and <strong>Laser Mode</strong>
+    for engraving or cutting with an attached digital laser. Only one mode is
+    active at a time.
+  </p>
+
+  <p>To see which mode is currently active, open the <strong>Mode</strong> tab in the State Panel.</p>
+
+  <figure class="figure-inline">
+    <img src="assets/enable_spindle_mode_state_tab.png"
+         alt="Mode tab showing Spindle Mode and Laser Mode indicators">
+    <figcaption>
+      <strong>Mode</strong> tab — status indicators for Spindle Mode and Laser Mode.
+    </figcaption>
+  </figure>
+
+  <ul>
+    <li>
+      <strong>Spindle Mode ON</strong><br>
+      <ul>
+        <li><em>Spindle Mode</em> indicator: green (enabled)</li>
+        <li><em>Laser Mode</em> indicator: red (disabled)</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Laser Mode ON</strong><br>
+      <ul>
+        <li><em>Spindle Mode</em> indicator: red (disabled)</li>
+        <li><em>Laser Mode</em> indicator: green (enabled)</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>
+    The <strong>Enable Spindle Mode</strong> button is your “back to normal carving”
+    switch. After any laser work, enabling Spindle Mode ensures that future
+    <span class="kbd">M3</span> / <span class="kbd">M5</span> commands control the
+    router or spindle instead of the laser.
+  </p>
+
+  <div class="callout callout-tip">
+    <p>
+      <strong>Best Practice:</strong> At the end of any laser job, always click
+      <strong>Enable Spindle Mode</strong> so the machine is back in a
+      known-safe default state for the next user or the next work day.
+    </p>
+  </div>
+
+  <h3>2. Where to Find the Button</h3>
+
+  <p>
+    The <strong>Enable Spindle Mode</strong> button is located on the
+    <strong>top toolbar</strong>. When you hover over it, OmniControl displays a tooltip such as
+    <em>“Enable Spindle Mode”</em> or <em>“Engage Spindle Mode Settings.”</em>
+  </p>
+
+  <figure class="figure-large">
+    <img src="assets/enable_spindle_mode_screenshot.png"
+         alt="Enable Spindle Mode popup dialog in OmniControl">
+    <figcaption>
+      Enable Spindle Mode confirmation popup in OmniControl.
+    </figcaption>
+  </figure>
+
+  <h3>3. When to Use Enable Spindle Mode</h3>
+
+  <p>Use the <strong>Enable Spindle Mode</strong> button whenever:</p>
+
+  <ul>
+    <li>
+      You’ve finished a <strong>laser job</strong> and are returning to
+      <strong>routing or milling</strong>.
+    </li>
+    <li>
+      You want to ensure the CNC behaves like a standard router:
+      the spindle starts and stops according to the G-code
+      (<span class="kbd">M3</span>, <span class="kbd">M5</span>), and all laser outputs remain disabled.
+    </li>
+    <li>
+      You’re <strong>ending your work day</strong> and want the machine ready
+      for normal carving at the next startup.
+    </li>
+  </ul>
+
+  <p>
+    In short: if your next operation uses a cutting bit in the spindle,
+    you should be in <strong>Spindle Mode</strong>.
+  </p>
+
+  <h3>4. Safety Checklist Before Enabling Spindle Mode</h3>
+
+  <p>
+    Before you confirm the Enable Spindle Mode popup, walk through this quick checklist:
+  </p>
+
+  <h4>4.1 Correct Tool Installed</h4>
+  <ul>
+    <li>Install the router bit or endmill you plan to use for the job.</li>
+    <li>Verify the bit is seated properly and the collet and nut are securely tightened.</li>
+  </ul>
+
+  <h4>4.2 Dust Collection &amp; Workholding</h4>
+  <ul>
+    <li>Confirm clamps, screws, tape, or fixtures are secure and clear of the cutting path.</li>
+    <li>Attach and position the dust shoe or dust collection system if used.</li>
+  </ul>
+
+  <h4>4.3 Spindle Power &amp; Cooling</h4>
+  <ul>
+    <li>
+      For <strong>routers</strong>: make sure the physical router power switch is set
+      according to Digital Wood Carver’s recommendations so the controller can safely
+      start and stop the router.
+    </li>
+    <li>
+      For <strong>water-cooled spindles</strong>: confirm coolant flow is active and
+      circulating before any cutting operation.
+    </li>
+  </ul>
+
+  <h4>4.4 Laser Hardware (If Attached) — Important!</h4>
+  <ul>
+    <li>
+      If a digital laser module is currently mounted, ensure it is powered
+      <strong>OFF</strong> and the beam is not armed.
+    </li>
+    <li>
+      <strong>Best Practice:</strong> remove the laser module entirely when it is not in use.
+      This prevents dust and debris from collecting on the diode, lens, and internal
+      optics during carving operations, and it protects the laser from accidental bumps.
+    </li>
+    <li>
+      Store the laser in a <strong>clean, dust-free, and protected location</strong>,
+      with its lens cap or cover installed.
+    </li>
+  </ul>
+
+  <div class="callout">
+    <p>
+      The 6-Watt and 45-Watt laser modules use precision optics and active cooling.
+      Sawdust accumulation is one of the most common causes of premature laser
+      failure and reduced beam quality. Removing the laser when carving helps extend
+      its life and maintains engraving accuracy.
+    </p>
+  </div>
+
+  <h3>5. Running the Enable Spindle Mode Routine</h3>
+
+  <ol>
+    <li>
+      <strong>Click the Enable Spindle Mode button.</strong><br>
+      OmniControl opens the <em>Enable Spindle Mode</em> popup dialog with a spindle illustration.
+    </li>
+    <li>
+      <strong>Review the dialog.</strong><br>
+      This is a confirmation step, not a calibration wizard. Think of it as OmniControl asking:
+      <em>“Are you sure you are done with laser and ready for routing?”</em>
+    </li>
+    <li>
+      <strong>Choose how to proceed:</strong>
+      <ul>
+        <li>
+          Press <strong>OK (✓)</strong> in the upper-right of the popup.<br>
+          OmniControl:
+          <ul>
+            <li>Enables <strong>Spindle Mode</strong> and disables <strong>Laser Mode</strong>.</li>
+            <li>Updates the <strong>Mode</strong> tab to show Spindle Mode (green) and Laser Mode (red).</li>
+            <li>Ensures future <span class="kbd">M3</span>/<span class="kbd">M5</span> commands control the spindle.</li>
+          </ul>
+        </li>
+        <li>
+          Press <span class="kbd">ESC</span> on the keyboard.<br>
+          This cancels the operation and leaves the current mode unchanged.
+        </li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="callout callout-tip">
+    <p>
+      <strong>Tip:</strong> If you accidentally click the wrong mode button
+      (Laser or Spindle), simply press <span class="kbd">ESC</span> instead of
+      confirming with <strong>OK (✓)</strong>.
+    </p>
+  </div>
+
+  <h3>6. End-of-Day Best Practice</h3>
+
+  <p>
+    When you finish your last job of the day, it’s a good habit to leave the
+    machine in a safe, predictable state:
+  </p>
+
+  <ol>
+    <li>Stop any running program and move the Z-axis up to a safe height.</li>
+    <li>Jog the spindle away from clamps and fixtures if needed.</li>
+    <li>
+      Click <strong>Enable Spindle Mode</strong> and press <strong>OK (✓)</strong> so:
+      <ul>
+        <li>Spindle Mode = ON</li>
+        <li>Laser Mode = OFF</li>
+      </ul>
+    </li>
+    <li>Power down the CNC, computer, and accessories per your normal shutdown routine.</li>
+  </ol>
+
+  <p>
+    Doing this at the end of each day means that the next time the system is
+    powered up, OmniControl is already in a known-safe default configuration
+    ready for normal carving.
+  </p>
+
+</article>
+<!-- /chapter-enable-spindle-mode -->
+
+    <!-- Add more <article class="manual-chapter">…</article> blocks here for future chapters -->
+
+  </main><!-- /manual-content -->
+
+</div><!-- /manual-layout -->
+
+<!-- SIMPLE CLIENT-SIDE SEARCH (FILTERS CHAPTERS BY TEXT MATCH) -->
+<script>
+  (function() {
+    const searchInput = document.getElementById('manual-search');
+    const searchCount = document.getElementById('search-count');
+    const chapters = Array.from(document.querySelectorAll('.manual-chapter'));
+
+    function performSearch() {
+      const query = searchInput.value.trim().toLowerCase();
+      if (!query) {
+        chapters.forEach(ch => ch.style.display = '');
+        searchCount.textContent = '';
+        return;
+      }
+
+      let matches = 0;
+      chapters.forEach(ch => {
+        const text = ch.textContent.toLowerCase();
+        const hasMatch = text.includes(query);
+        ch.style.display = hasMatch ? '' : 'none';
+        if (hasMatch) matches++;
+      });
+
+      if (matches === 0) {
+        searchCount.textContent = 'No sections match your search.';
+      } else if (matches === 1) {
+        searchCount.textContent = '1 section matches your search.';
+      } else {
+        searchCount.textContent = matches + ' sections match your search.';
+      }
+    }
+
+    searchInput.addEventListener('input', performSearch);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 286 286">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #00bfff;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        stroke: #000;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-4 {
+        fill: none;
+        stroke: #fff;
+        stroke-linejoin: round;
+        stroke-width: 10px;
+      }
+
+      .cls-2 {
+        fill: #dfe4f3;
+      }
+
+      .cls-3 {
+        fill: orange;
+      }
+    </style>
+  </defs>
+  <g id="Page-1">
+    <g id="IMG_BTN_ATC_Tool_Measure" data-name="IMG BTN ATC Tool Measure">
+      <rect id="Rectangle" class="cls-4" x="5" y="5" width="276" height="276"/>
+    </g>
+  </g>
+  <rect class="cls-2" x="39.93" y="189.2" width="33.68" height="20.14"/>
+  <rect class="cls-2" x="52.28" y="209.34" width="6.97" height="29.64"/>
+  <path class="cls-1" d="M256.62,188.82c3.39,0,6.14,2.75,6.14,6.14v67.58c0,3.39-2.75,6.14-6.14,6.14H103.03c-3.39,0-6.14-2.75-6.14-6.14v-67.58c0-3.39,2.75-6.14,6.14-6.14h153.58Z"/>
+  <path class="cls-2" d="M93.12,23.98c3.4,0,6.16,2.76,6.16,6.16v153.93c0,3.4-2.76,6.16-6.16,6.16H25.38c-3.4,0-6.16-2.76-6.16-6.16V30.14c0-3.4,2.76-6.16,6.16-6.16h67.73Z"/>
+  <path class="cls-3" d="M149.5,13c51.54,0,93.42,40.31,96.84,91h13.66c3.59,0,6.5,2.92,6.49,6.51,0,1.21-.34,2.4-.98,3.43l-32.5,52c-1.91,3.04-5.92,3.97-8.96,2.06-.83-.52-1.54-1.23-2.06-2.06l-32.5-52c-1.9-3.05-.97-7.06,2.08-8.96,1.03-.64,2.22-.98,3.43-.98h11.69c-3.36-29.15-27.12-52-57.19-52-3.59,0-6.5-2.91-6.5-6.5v-26c0-3.59,2.91-6.5,6.5-6.5h0Z"/>
+  <rect class="cls-1" x="70.58" y="219.38" width="33.6" height="20.09" transform="translate(316.81 142.04) rotate(90)"/>
+  <rect class="cls-1" x="59.07" y="213.64" width="6.96" height="29.58" transform="translate(290.97 165.88) rotate(90)"/>
+</svg>
