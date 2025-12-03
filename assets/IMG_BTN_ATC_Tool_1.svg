@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="311px" height="310px" viewBox="0 0 311 310" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>IMG_BTN_ATC_Tool_1</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="IMG_BTN_ATC_Tool_1" transform="translate(5.5, 5)" stroke="#FFFFFF">
+            <rect id="Rectangle" stroke-width="10" stroke-linejoin="round" x="0" y="0" width="300" height="300"></rect>
+            <g id="1" transform="translate(81, 44)" fill="#FFFFFF" fill-rule="nonzero" stroke-width="4">
+                <path d="M94.7246094,-2 L94.7246094,214.402344 L47.9511719,214.402344 L47.9511719,67.9179688 L-2,67.9179688 L-1.99999999,35.583775 C12.0406609,35.0052063 21.7927521,34.1240035 27.2540907,32.9103743 C35.2281831,31.1486562 41.7316078,27.6431505 46.742432,22.3539479 C50.1605419,18.7510753 52.7229271,13.9351042 54.4767364,7.93490275 C55.4789709,4.37890475 56.0078125,1.7355582 56.0078125,0 C56.0078125,-0.569027018 55.9509648,-1.23563655 55.8392236,-2 L94.7246094,-2 Z" id="Path"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 286 286">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #fff;
+        stroke-linejoin: round;
+        stroke-width: 10px;
+      }
+
+      .cls-2 {
+        fill: #dfe4f4;
+      }
+    </style>
+  </defs>
+  <g id="Page-1">
+    <g id="IMG_BTN_ATC_Tool_Measure" data-name="IMG BTN ATC Tool Measure">
+      <rect id="Rectangle" class="cls-1" x="5" y="5" width="276" height="276"/>
+    </g>
+  </g>
+  <g>
+    <path class="cls-2" d="M119.31,119.65c-2.95-12.41-12.41-19.54-26.22-19.54-21.33,0-33.51,15.67-33.51,42.81s12.25,43.05,32.73,43.05,23.89-7.37,27.3-22.88h30.87c-3.49,29.32-25.44,47.47-57.39,47.47s-62.59-26.37-62.59-67.63,24.04-67.48,62.44-67.48,52.59,16.68,56,44.21c0,0-29.63,0-29.63,0Z"/>
+    <path class="cls-2" d="M255.42,101.97c-26.37,21.56-45.76,66.55-45.37,105.64h-30.64c1.55-36.61,16.44-71.74,44.05-104.08h-57.55v-23.89h89.58v22.34h-.08Z"/>
+  </g>
+</svg>

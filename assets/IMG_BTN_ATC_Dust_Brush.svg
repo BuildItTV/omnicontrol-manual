@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="310px" height="310px" viewBox="0 0 310 310" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>IMG_BTN_ATC_Tool_Home</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="IMG_BTN_ATC_Tool_Home" transform="translate(5, 5)" stroke="#FFFFFF">
+            <rect id="Rectangle" stroke-width="10" stroke-linejoin="round" x="0" y="0" width="300" height="300"></rect>
+            <g id="Dust-Brush" transform="translate(13, 80)" stroke-width="7">
+                <path d="M182,77 C181.413529,89.7105263 179.672007,100.210526 176.775433,108.5 C173.87886,116.789474 168.953715,127.289474 162,140" id="Path-2-Copy-2" stroke-linecap="round"></path>
+                <path d="M133,77 C132.413529,89.7105263 130.672007,100.210526 127.775433,108.5 C124.87886,116.789474 119.953715,127.289474 113,140" id="Path-2-Copy-4" stroke-linecap="round"></path>
+                <path d="M84,77 C83.413529,89.7105263 81.6720067,100.210526 78.7754331,108.5 C75.8788596,116.789474 70.9537152,127.289474 64,140" id="Path-2-Copy-5" stroke-linecap="round"></path>
+                <path d="M44.23583,59 C47.5885144,76.0248619 46.1625383,91.1779231 39.9579017,104.459184 C33.7532651,117.740444 28.4339645,129.587383 24,140" id="Path-2-Copy-3" stroke-linecap="round"></path>
+                <path d="M24,140 L209.043865,140 C211.454436,134.47619 214.983196,125.085714 219.630144,111.828571 C224.277092,98.5714286 226.381503,78.9619048 225.943377,53" id="Path" stroke-linecap="round"></path>
+                <path d="M224,15.5 C224.690356,15.5 225.315356,15.779822 225.767767,16.232233 C226.220178,16.6846441 226.5,17.3096441 226.5,18 L226.5,52.5 L42.5,52.5 L42.5,18 C42.5,17.3096441 42.779822,16.6846441 43.232233,16.232233 C43.6846441,15.779822 44.3096441,15.5 45,15.5 Z" id="Rectangle" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>
